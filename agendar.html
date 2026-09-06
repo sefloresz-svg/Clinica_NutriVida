@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriVida - Agendar Cita</title>
+    
+    <!-- Protección de sesión -->
+    <script src="verificarSesion.js"></script>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <header>
+        <h1>Clínica NutriVida</h1>
+        <nav>
+            <a href="index.html">Inicio</a> | 
+            <a href="servicios.html">Servicios y Planes</a> | 
+            <a href="agendar.html">Agendar Cita</a> | 
+            <a href="equipo.html">Nuestros Nutricionistas</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Reserva tu Hora de Atención</h2>
+        <p>Completa el formulario para agendar una cita con nuestros profesionales en Temuco.</p>
+
+        <form id="formAgendar" onsubmit="validarYAgendar(event)">
+            <!-- Datos del Paciente -->
+            <div>
+                <label for="nombrePaciente">Nombre Completo del Paciente:</label><br>
+                <input type="text" id="nombrePaciente" placeholder="Ej: Juan Pérez" required>
+            </div><br>
+
+            <div>
+                <label for="rutPaciente">RUT:</label><br>
+                <input type="text" id="rutPaciente" placeholder="Ej: 12345678-9" required>
+            </div><br>
+
+            <!-- Selección de Servicio -->
+            <div>
+                <label for="selectServicio">Servicio / Plan Nutricional:</label><br>
+                <select id="selectServicio" required>
+                    <option value="">-- Seleccione un servicio --</option>
+                </select>
+            </div><br>
+
+            <!-- Selección de Nutricionista -->
+            <div>
+                <label for="selectNutricionista">Nutricionista de preferencia:</label><br>
+                <select id="selectNutricionista" required>
+                    <option value="">-- Seleccione profesional --</option>
+                </select>
+            </div><br>
+
+            <!-- Fecha y Hora -->
+            <div>
+                <label for="fechaCita">Fecha de atención:</label><br>
+                <input type="date" id="fechaCita" required>
+            </div><br>
+
+            <div>
+                <label for="horaCita">Hora:</label><br>
+                <input type="time" id="horaCita" required>
+            </div><br>
+
+            <div>
+                <label for="motivoCita">Motivo de la consulta:</label><br>
+                <textarea id="motivoCita" rows="3" placeholder="Ej: Control de peso, primera consulta vegetariana, etc."></textarea>
+            </div><br>
+
+            <button type="submit">Confirmar y Agendar Cita</button>
+        </form>
+
+        <!-- Mensajes dinámicos de éxito o error -->
+        <p id="mensajeError" style="color: red; font-weight: bold; margin-top: 15px;"></p>
+        <p id="mensajeExito" style="color: green; font-weight: bold; margin-top: 15px;"></p>
+
+        <hr>
+
+        <!-- Sección donde se verán las citas agendadas guardadas en localStorage -->
+        <h3>Mis Citas Agendadas</h3>
+        <div id="listaCitas"></div>
+    </main>
+
+    <script src="agendar.js"></script>
+</body>
+</html>

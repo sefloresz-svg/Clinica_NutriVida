@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriVida - Inicio</title>
     
-    <!-- ⚠️ OBLIGATORIO: Si no hay sesión iniciada, este script redirige inmediatamente a login.html -->
+    <!-- Redirige inmediatamente a login.html si no hay sesión -->
     <script src="verificarSesion.js"></script>
     
     <link rel="stylesheet" href="estilos.css">
@@ -13,12 +13,12 @@
 
 <body>
 
-    <!-- Encabezado con información del usuario y botón de cerrar sesión -->
+    <!-- Encabezado con información del usuario y botón activo -->
     <header>
         <h1>Clínica NutriVida</h1>
         <div id="infoUsuario">
             <span>Bienvenido/a, <strong id="nombreUsuario"></strong> (<span id="rolUsuario"></span>)</span>
-            <button onclick="cerrarSesion()">Cerrar Sesión</button>
+            <button type="button" onclick="cerrarSesionForzada()">Cerrar Sesión</button>
         </div>
     </header>
 
@@ -53,21 +53,27 @@
         <p>&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
 
-    <!-- Script para mostrar los datos del usuario logueado y la lógica de salir -->
+    <!-- Script de carga de datos y función de salida -->
     <script>
-        // 1. Leemos los datos que guardamos en login.js
-        let usuarioSesion = JSON.parse(localStorage.getItem("usuarioSesion"));
-
-        // 2. Insertamos el nombre y rol en el HTML
-        if (usuarioSesion) {
-            document.getElementById("nombreUsuario").textContent = usuarioSesion.nombre;
-            document.getElementById("rolUsuario").textContent = usuarioSesion.rol;
+        // 1. Cargar nombre y rol del usuario logueado
+        try {
+            let usuarioSesion = JSON.parse(localStorage.getItem("usuarioSesion"));
+            if (usuarioSesion) {
+                if (document.getElementById("nombreUsuario")) {
+                    document.getElementById("nombreUsuario").textContent = usuarioSesion.nombre;
+                }
+                if (document.getElementById("rolUsuario")) {
+                    document.getElementById("rolUsuario").textContent = usuarioSesion.rol;
+                }
+            }
+        } catch (e) {
+            console.error("Error al leer la sesión:", e);
         }
 
-        // 3. Función para cerrar sesión
-        function cerrarSesion() {
-            localStorage.removeItem("usuarioSesion"); // Borra la sesión
-            window.location.href = "login.html";       // Manda al login
+        // 2. Función global para cerrar sesión
+        function cerrarSesionForzada() {
+            localStorage.clear();
+            window.location.replace("login.html");
         }
     </script>
 
