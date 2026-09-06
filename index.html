@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriVida - Inicio</title>
+    
+    <!-- ⚠️ OBLIGATORIO: Si no hay sesión iniciada, este script redirige inmediatamente a login.html -->
+    <script src="verificarSesion.js"></script>
+    
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <!-- Encabezado con información del usuario y botón de cerrar sesión -->
+    <header>
+        <h1>Clínica NutriVida</h1>
+        <div id="infoUsuario">
+            <span>Bienvenido/a, <strong id="nombreUsuario"></strong> (<span id="rolUsuario"></span>)</span>
+            <button onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Menú de navegación principal -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios y Planes</a></li>
+            <li><a href="agendar.html">Agendar Cita</a></li>
+            <li><a href="equipo.html">Nuestros Nutricionistas</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido principal de la página de inicio -->
+    <main>
+        <section class="banner">
+            <h2>Asesoría Nutricional Personalizada en Temuco</h2>
+            <p>Te acompañamos en tu camino hacia una vida saludable con planes adaptados a tus objetivos.</p>
+        </section>
+
+        <section class="informacion">
+            <h3>¿Por qué elegir NutriVida?</h3>
+            <ul>
+                <li>Atención personalizada por nutricionistas certificados.</li>
+                <li>Seguimiento constante de tus mediciones e indicadores.</li>
+                <li>Planes especializados: pérdida de peso, rendimiento deportivo, alimentación vegetariana/vegana y más.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
+    </footer>
+
+    <!-- Script para mostrar los datos del usuario logueado y la lógica de salir -->
+    <script>
+        // 1. Leemos los datos que guardamos en login.js
+        let usuarioSesion = JSON.parse(localStorage.getItem("usuarioSesion"));
+
+        // 2. Insertamos el nombre y rol en el HTML
+        if (usuarioSesion) {
+            document.getElementById("nombreUsuario").textContent = usuarioSesion.nombre;
+            document.getElementById("rolUsuario").textContent = usuarioSesion.rol;
+        }
+
+        // 3. Función para cerrar sesión
+        function cerrarSesion() {
+            localStorage.removeItem("usuarioSesion"); // Borra la sesión
+            window.location.href = "login.html";       // Manda al login
+        }
+    </script>
+
+</body>
+</html>
