@@ -17,68 +17,64 @@
     <!-- Encabezado con información del usuario y botón activo -->
     <header>
         <h1>Clínica NutriVida</h1>
-        <!-- Menú de navegación principal -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="servicios.html">Servicio y Planes</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="agendar.html">Agendar Cita</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="equipo.html">Nuestros Nutricionistas</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-                </div>
-            </div>
-            </nav>
-
-        
         <div id="infoUsuario">
             <span>Bienvenido/a, <strong id="nombreUsuario"></strong> (<span id="rolUsuario"></span>)</span>
             <button type="button" onclick="cerrarSesionForzada()">Cerrar Sesión</button>
         </div>
     </header>
 
-    
-    <!-- Contenido principal de la página de inicio -->
-    <main>
-        <section class="banner">
-            <h2>Asesoría Nutricional Personalizada en Temuco</h2>
-            <p>Te acompañamos en tu camino hacia una vida saludable con planes adaptados a tus objetivos.</p>
-        </section>
-
-        <section class="informacion">
-            <h3>¿Por qué elegir NutriVida?</h3>
-            <ul>
-                <li>Atención personalizada por nutricionistas certificados.</li>
-                <li>Seguimiento constante de tus mediciones e indicadores.</li>
-                <li>Planes especializados: pérdida de peso, rendimiento deportivo, alimentación vegetariana/vegana y más.</li>
+    <!-- Menú de navegación principal -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="servicios.html">Servicio y Planes</a>
+                </li>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="agendar.html">Agendar Cita</a>
+                </li>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="equipo.html">Nuestros Nutricionistas</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li>
             </ul>
-        </section>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            </div>
+        </div>
+    </nav>
+
+    
+    <!-- Contenido Principal Centrado -->
+    <main class="container text-center my-auto">
+        <h1 class="display-6 fw-bold mb-3">Asesoría Nutricional Personalizada en Temuco</h1>
+        <p class="lead mb-5">Te acompañamos en tu camino hacia una vida saludable con planes adaptados a tus objetivos.</p>
+
+        <h2 class="h4 fw-bold mb-3">¿Por qué elegir NutriVida?</h2>
+        <ul class="list-unstyled d-inline-block text-start">
+        <li class="mb-2">• Atención personalizada por nutricionistas certificados.</li>
+        <li class="mb-2">• Seguimiento constante de tus mediciones e indicadores.</li>
+        <li class="mb-2">• Planes especializados: pérdida de peso, rendimiento deportivo, alimentación vegetariana/vegana y más.</li>
+        </ul>
     </main>
 
-    <footer>
-        <p>&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
+    <!-- Pie de página único para todas las páginas -->
+    <footer class="text-center py-4 border-top mt-5">
+        <p class="mb-0">&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
 
     <!-- Script de carga de datos y función de salida -->
