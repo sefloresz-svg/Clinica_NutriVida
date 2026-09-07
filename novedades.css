@@ -1,0 +1,57 @@
+/* Tarjetas de novedades */
+.card-novedad {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: none;
+}
+
+.card-novedad .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.btn-novedad {
+    background-color: #2aa18a;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 100%;
+    border: none;
+    padding: 10px 0;
+    transition: background-color 0.2s ease;
+}
+
+.btn-novedad:hover {
+    background-color: #228370;
+    color: #ffffff;
+}
+
+/* Modales emergentes */
+.modal-custom {
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.modal-btn-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    background-color: #ffffff;
+    padding: 8px;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+.modal-btn-close:hover {
+    opacity: 1;
+}

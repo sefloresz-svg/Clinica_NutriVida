@@ -22,6 +22,7 @@
         <nav class="nav-bar">
             <div class="nav-links">
                 <a href="index.html">Inicio</a>
+                <a href="novedades.html">Novedades</a>
                 <a href="servicios.html">Servicios</a>
                 <a href="equipo.html">Nuestros Nutricionistas</a>
                 <a href="agendar.html" data-rol="Paciente,Admin">Agendar Cita</a>
@@ -32,15 +33,15 @@
     </header>
 
     <main class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">Pacientes</h1>
-            <a href="agendar.html" class="btn text-white fw-bold" style="background-color: #7c3aed; border-radius: 8px;">+ Nueva cita</a>
+        <div class="mb-4">
+            <h1 class="fw-bold mb-1">Agenda de Pacientes</h1>
+            <p id="subtituloNutri" class="text-muted mb-0">Listado de citas asignadas a tu perfil profesional.</p>
         </div>
 
         <div class="card p-4 shadow-sm border-0">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 fw-bold mb-0">Listado de pacientes</h2>
-                <input type="text" id="inputBuscar" class="form-control w-25" placeholder="Buscar paciente..." onkeyup="filtrarPacientes()">
+                <h2 class="h5 fw-bold mb-0">Mis Atenciones</h2>
+                <input type="text" id="inputBuscar" class="form-control w-25" placeholder="Buscar paciente o RUT..." onkeyup="filtrarPacientes()">
             </div>
 
             <div class="table-responsive">
@@ -51,16 +52,72 @@
                             <th>RUT</th>
                             <th>Fecha / Hora</th>
                             <th>Servicio</th>
-                            <th>Estado</th>
+                            <th>Nutricionista</th>
+                            <th>Ficha Clínica</th>
                         </tr>
                     </thead>
                     <tbody id="tablaPacientes">
-                        <!-- Carga dinámicamente desde LocalStorage -->
+                        <!-- Carga dinámicamente según el rol y perfil -->
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
+
+    <!-- Modal Ficha Clínica -->
+    <div class="modal fade" id="modalFicha" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header style-header text-white" style="background-color: #6b21a8;">
+                    <h5 class="modal-title fw-bold" id="modalFichaTitulo">Ficha Clínica del Paciente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formFicha" onsubmit="guardarFichaClinica(event)">
+                        <input type="hidden" id="fichaRut">
+                        <input type="hidden" id="fichaNutriAsignado">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Paciente:</label>
+                                <input type="text" id="fichaNombre" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">RUT:</label>
+                                <input type="text" id="fichaRutMostrar" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Peso (kg):</label>
+                                <input type="number" step="0.1" id="fichaPeso" class="form-control" placeholder="Ej: 70.5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estatura (cm):</label>
+                                <input type="number" id="fichaEstatura" class="form-control" placeholder="Ej: 172" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Diagnóstico Nutricional:</label>
+                            <textarea id="fichaDiagnostico" class="form-control" rows="3" placeholder="Escriba el diagnóstico actual del paciente..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Plan / Indicaciones:</label>
+                            <textarea id="fichaIndicaciones" class="form-control" rows="3" placeholder="Pautas de alimentación, restricciones, controles..."></textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn text-white fw-bold" style="background-color: #7c3aed;">Guardar Ficha</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="text-center py-3">
         &copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía
