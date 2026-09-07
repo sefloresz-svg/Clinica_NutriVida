@@ -1,0 +1,58 @@
+/* Recuadros para Planes y Consultas */
+.contenedor-planes {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.grid-planes {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.tarjeta-plan {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 25px;
+    flex: 1;
+    min-width: 260px;
+    max-width: 330px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    text-align: center;
+}
+
+.tarjeta-plan .precio {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #319787;
+    margin: 10px 0;
+}
+
+/* Sección "¿Por qué elegir NutriVida?" separada abajo */
+.seccion-por-que {
+    background-color: #e8f4f2;
+    padding: 50px 20px;
+    margin-top: 60px; /* Empuja la sección más abajo */
+    border-top: 1px solid #d1e7e4;
+}
+
+.grid-beneficios {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 20px auto 0 auto;
+}
+
+.item-beneficio {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 240px;
+    text-align: center;
+}
