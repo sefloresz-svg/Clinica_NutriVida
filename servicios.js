@@ -47,22 +47,28 @@ let servicios = [
     }
 ];
 
-function cargarServicios() {
+function mostrarServicios() {
     let contenedor = document.getElementById("contenedorServicios");
     let html = "";
 
     for (let i = 0; i < servicios.length; i++) {
+        let s = servicios[i];
         html += `
-        <div class="tarjeta-servicio">
-            <span class="etiqueta">${servicios[i].tipo}</span>
-            <h3>${servicios[i].nombre}</h3>
-            <p><strong>Código:</strong> ${servicios[i].codigo}</p>
-            <p><strong>Duración / Modalidad:</strong> ${servicios[i].duracion} | ${servicios[i].modalidad}</p>
-            <p>${servicios[i].descripcion}</p>
-            <p class="precio">Precio: $${servicios[i].precio}</p>
-            <button onclick="seleccionarServicio('${servicios[i].codigo}')">Reservar este servicio</button>
-            <hr>
-        </div>
+            <div class="tarjeta-servicio">
+                <div>
+                    <span class="tipo-badge">${s.tipo}</span>
+                    <h3>${s.nombre}</h3>
+                    <p class="detalles"><strong>Código:</strong> ${s.codigo}</p>
+                    <p class="detalles"><strong>Duración:</strong> ${s.duracion} | ${s.modalidad}</p>
+                    <p>${s.descripcion}</p>
+                </div>
+                <div>
+                    <div class="precio">$${s.precio.toLocaleString("es-CL")}</div>
+                    <button type="button" class="btn-reservar" onclick="seleccionarServicio('${s.codigo}')">
+                        Reservar este servicio
+                    </button>
+                </div>
+            </div>
         `;
     }
 
@@ -70,10 +76,9 @@ function cargarServicios() {
 }
 
 function seleccionarServicio(codigo) {
-    // Guarda el código seleccionado para autocompletar en el agendamiento
     localStorage.setItem("servicioSeleccionado", codigo);
     window.location.href = "agendar.html";
 }
 
-// Ejecución al cargar el archivo
-cargarServicios();
+// Ejecutar al cargar
+mostrarServicios();

@@ -18,48 +18,76 @@
 <body>
 
     <!-- Encabezado / Navbar -->
-    <header class="navbar">
-
-        <!-- 1. Izquierda: Logo con Imagen + Nombre -->
-        <div class="logo-container">
-            <img src="img/Captura de pantalla 2026-09-06 231024.png" alt="Logo Clínica NutriVida" class="logo">
-            <span class="brand-name">Clínica NutriVida</span>
+    <header class="header-principal">
+    <!-- Barra Superior: Brand a la izquierda, Usuario a la derecha -->
+        <div class="top-bar">
+            <div class="logo-container">
+                <img src="img/Captura de pantalla 2026-09-06 231024.png" alt="Logo Clínica NutriVida" class="logo">
+                <span class="brand-name">Clínica NutriVida</span>
+            </div>
+            
+            <!-- Estado de sesión (inyectado por verificarSesion.js) -->
+            <div id="seccion-usuario"></div>
         </div>
 
-        <nav class="nav-links">
-            <!-- Visto por todos -->
-            <a href="index.html" class="arriba">Inicio</a>
-            <a href="servicios.html" class="arriba">Servicios</a>
-
-            <!-- Solo accesible por Usuarios normales y Administradores -->
-            <a href="agendar.html" class="arriba" data-rol="Usuario,Admin">Agendar Cita</a>
-
-            <!-- Solo visto por el Nutricionista y Admin -->
-            <a href="pacientes.html" class="arriba" data-rol="Nutricionista,Admin">Ver Pacientes</a>
-
-            <!-- Solo visto por el Administrador -->
-            <a href="gestion.html" class="arriba" data-rol="Admin">Panel Administración</a>
+        <!-- Barra Inferior: Botones de navegación centrados -->
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="equipo.html">Nuestros Nutricionistas</a>
+                <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
+                <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+                <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+            </div>
         </nav>
-
-        <!-- Barra de usuario a la extrema derecha -->
-        <div id="seccion-usuario"></div>
     </header>
    
     <!-- Contenido Principal Centrado -->
-    <main class="container text-center my-auto">
-        <div>
-            <h1 class="display-6 fw-bold mb-3">Asesoría Nutricional Personalizada en Temuco</h1>
-            <p class="lead mb-5">Te acompañamos en tu camino hacia una vida saludable con planes adaptados a tus objetivos.</p>
+    <main class="inicio-container">
+    <!-- 1. Hero / Banner Principal -->
+    <section class="hero-section">
+        <div class="hero-texto">
+            <h1>Asesoría Nutricional Personalizada en Temuco</h1>
+            <p>Te acompañamos en tu camino hacia una vida saludable con planes 100% adaptados a tus objetivos médicos y deportivos.</p>
+            <a href="agendar.html" class="btn-hero-agendar">Agendar Mi Cita</a>
         </div>
+        <div class="hero-imagen">
+            <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600&auto=format&fit=crop" alt="Alimentación Saludable NutriVida">
+        </div>
+    </section>
 
-        <div>
-            <h2 class="h4 fw-bold mb-3">¿Por qué elegir NutriVida?</h2>
-            <ul class="list-unstyled d-inline-block text-start">
-            <li class="mb-2">• Atención personalizada por nutricionistas certificados.</li>
-            <li class="mb-2">• Seguimiento constante de tus mediciones e indicadores.</li>
-            <li class="mb-2">• Planes especializados: pérdida de peso, rendimiento deportivo, alimentación vegetariana/vegana y más.</li>
-            </ul>
+    <!-- 2. Sección ¿Por qué elegirnos? en 3 Tarjetas -->
+    <section class="por-que-seccion">
+        <h2 class="titulo-seccion">¿Por qué elegir NutriVida?</h2>
+        
+        <div class="grid-beneficios">
+            <div class="tarjeta-beneficio">
+                <div class="icono-beneficio">👨‍⚕️</div>
+                <h3>Atención Certificada</h3>
+                <p>Consulta presencial y online liderada por nutricionistas universitarios con amplia experiencia clínica.</p>
+            </div>
+
+            <div class="tarjeta-beneficio">
+                <div class="icono-beneficio">📊</div>
+                <h3>Seguimiento Continuo</h3>
+                <p>Medición constante de tus indicadores antropométricos para evaluar avances reales en cada control.</p>
+            </div>
+
+            <div class="tarjeta-beneficio">
+                <div class="icono-beneficio">🥗</div>
+                <h3>Planes a tu Medida</h3>
+                <p>Pérdida de peso, nutrición deportiva, salud metabólica, dietas vegetarianas y veganas.</p>
+            </div>
         </div>
+        </section>
+
+        <!-- 3. Banner de Llamado a la Acción (CTA) -->
+        <section class="cta-banner">
+            <h2>¿Listo para comenzar tu transformación?</h2>
+            <p>Reserva tu primera evaluación en menos de 2 minutos.</p>
+            <a href="agendar.html" class="btn-cta-secundario">Ver Disponibilidad</a>
+        </section>
     </main>
 
     <!-- Pie de página único para todas las páginas -->
@@ -68,8 +96,8 @@
     </footer>
 
     <!-- Importar el script en todas las páginas -->
+    <script src="navbar.js"></script>
     <script src="verificarSesion.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>

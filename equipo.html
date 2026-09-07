@@ -16,46 +16,53 @@
 <body>
 
     <!-- Encabezado / Navbar -->
-    <header class="navbar">
-        <div class="logo">
-            <a href="index.html"><strong>Clínica NutriVida</strong></a>
+    <header class="header-principal">
+    <!-- Barra Superior: Brand a la izquierda, Usuario a la derecha -->
+        <div class="top-bar">
+            <div class="logo-container">
+                <img src="img/Captura de pantalla 2026-09-06 231024.png" alt="Logo Clínica NutriVida" class="logo">
+                <span class="brand-name">Clínica NutriVida</span>
+            </div>
+            
+            <!-- Estado de sesión (inyectado por verificarSesion.js) -->
+            <div id="seccion-usuario"></div>
         </div>
 
-        <nav class="nav-links">
-            <!-- Visto por todos -->
-            <a href="index.html">Inicio</a>
-            <a href="servicios.html">Servicios</a>
-
-            <!-- Solo accesible por Usuarios normales y Administradores -->
-            <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
-
-            <!-- Solo visto por el Nutricionista y Admin -->
-            <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
-
-            <!-- Solo visto por el Administrador -->
-            <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+        <!-- Barra Inferior: Botones de navegación centrados -->
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="equipo.html">Nuestros Nutricionistas</a>
+                <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
+                <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+                <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+            </div>
         </nav>
-
-        <!-- Barra de usuario a la extrema derecha -->
-        <div id="seccion-usuario"></div>
     </header>
 
-    <main>
-        <h2>Equipo de Nutricionistas</h2>
-        <p>Profesionales certificados comprometidos con la salud y bienestar de la comunidad de Temuco.</p>
-
-        <!-- Contenedor donde JS renderiza el equipo -->
-        <div id="contenedorEquipo"></div>
+    <!-- Seccion principal de tarjetas -->
+    <main class="container">
+        <h1 class="titulo-seccion">Nuestro Equipo Médico</h1>
+        <div id="contenedorNutricionistas"></div>
     </main>
+
+    <!-- Modal emergente para detalles -->
+    <div id="modalDetalle" class="modal-overlay">
+        <div class="modal-content">
+            <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
+            <h3 id="modalNombre" style="color: #2c3e50; margin-bottom: 10px;"></h3>
+            <p id="modalTexto" style="color: #475569; line-height: 1.5;"></p>
+        </div>
+    </div>
 
     <footer class="text-center py-4 border-top mt-5">
         <p class="mb-0">&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
 
+    <script src="navbar.js"></script>
     <script src="verificarSesion.js"></script>
-
     <script src="equipo.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
 </body>

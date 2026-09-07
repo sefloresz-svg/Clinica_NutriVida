@@ -1,18 +1,74 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* Contenedor principal en grilla de 3 columnas */
+#contenedorServicios {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+    gap: 25px; /* Espacio entre cada tarjeta */
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
 }
 
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f4f9f8; /* Verde agua muy claro y suave */
-    color: #334155;
-    line-height: 1.6;
+/* Diseño del recuadro / tarjeta de cada servicio */
+.tarjeta-servicio {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Mantiene el botón siempre abajo */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-h1, h2, h3 {
+.tarjeta-servicio:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.tarjeta-servicio .tipo-badge {
+    align-self: flex-start;
+    background-color: #e8f4f2;
+    color: #319787;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.tarjeta-servicio h3 {
+    font-size: 1.2rem;
     color: #2c3e50;
-    text-align: center;
-    margin-bottom: 15px;
+    margin: 5px 0 10px 0;
+}
+
+.tarjeta-servicio .detalles {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.tarjeta-servicio .precio {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #319787;
+    margin: 15px 0;
+}
+
+/* Botón de reserva dentro de la tarjeta */
+.btn-reservar {
+    background-color: #319787;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-reservar:hover {
+    background-color: #26776a;
 }

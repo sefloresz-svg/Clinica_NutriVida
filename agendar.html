@@ -15,101 +15,98 @@
 </head>
 <body>
 
-    <!-- Encabezado / Navbar -->
-    <header class="navbar">
-        <div class="logo">
-            <a href="index.html"><strong>Clínica NutriVida</strong></a>
+    <header class="header-principal">
+    <!-- Barra Superior: Brand a la izquierda, Usuario a la derecha -->
+        <div class="top-bar">
+            <div class="logo-container">
+                <img src="img/Captura de pantalla 2026-09-06 231024.png" alt="Logo Clínica NutriVida" class="logo">
+                <span class="brand-name">Clínica NutriVida</span>
+            </div>
+            
+            <!-- Estado de sesión (inyectado por verificarSesion.js) -->
+            <div id="seccion-usuario"></div>
         </div>
 
-        <nav class="nav-links">
-            <!-- Visto por todos -->
-            <a href="index.html">Inicio</a>
-            <a href="servicios.html">Servicios</a>
-
-            <!-- Solo accesible por Usuarios normales y Administradores -->
-            <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
-
-            <!-- Solo visto por el Nutricionista y Admin -->
-            <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
-
-            <!-- Solo visto por el Administrador -->
-            <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+        <!-- Barra Inferior: Botones de navegación centrados -->
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="equipo.html">Nuestros Nutricionistas</a>
+                <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
+                <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+                <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+            </div>
         </nav>
-
-        <!-- Barra de usuario a la extrema derecha -->
-        <div id="seccion-usuario"></div>
     </header>
 
-    <main>
-        <h2>Reserva tu Hora de Atención</h2>
-        <p>Completa el formulario para agendar una cita con nuestros profesionales en Temuco.</p>
+    <main class="agendar-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Reserva tu Hora de Atención</h2>
+                <p>Completa los datos para agendar con nuestros especialistas en Temuco.</p>
+            </div>
 
-        <form id="formAgendar" onsubmit="validarYAgendar(event)">
-            <!-- Datos del Paciente -->
-            <div>
-                <label for="nombrePaciente">Nombre Completo del Paciente:</label><br>
-                <input type="text" id="nombrePaciente" placeholder="Ej: Juan Pérez" required>
-            </div><br>
+            <form id="formAgendar" class="form-grid">
+                <!-- Fila 1: Paciente y RUT -->
+                <div class="form-group">
+                    <label for="nombrePaciente">Nombre Completo del Paciente</label>
+                    <input type="text" id="nombrePaciente" placeholder="Ej: Juan Pérez" required>
+                </div>
 
-            <div>
-                <label for="rutPaciente">RUT:</label><br>
-                <input type="text" id="rutPaciente" placeholder="Ej: 12345678-9" required>
-            </div><br>
+                <div class="form-group">
+                    <label for="rutPaciente">RUT</label>
+                    <input type="text" id="rutPaciente" placeholder="Ej: 12345678-9" required>
+                </div>
 
-            <!-- Selección de Servicio -->
-            <div>
-                <label for="selectServicio">Servicio / Plan Nutricional:</label><br>
-                <select id="selectServicio" required>
-                    <option value="">-- Seleccione un servicio --</option>
-                </select>
-            </div><br>
+                <!-- Fila 2: Servicio y Nutricionista -->
+                <div class="form-group">
+                    <label for="selectServicio">Servicio / Plan Nutricional</label>
+                    <select id="selectServicio" required>
+                        <option value="">-- Seleccione un servicio --</option>
+                    </select>
+                </div>
 
-            <!-- Selección de Nutricionista -->
-            <div>
-                <label for="selectNutricionista">Nutricionista de preferencia:</label><br>
-                <select id="selectNutricionista" required>
-                    <option value="">-- Seleccione profesional --</option>
-                </select>
-            </div><br>
+                <div class="form-group">
+                    <label for="selectNutricionista">Nutricionista de preferencia</label>
+                    <select id="selectNutricionista" required>
+                        <option value="">-- Seleccione profesional --</option>
+                    </select>
+                </div>
 
-            <!-- Fecha y Hora -->
-            <div>
-                <label for="fechaCita">Fecha de atención:</label><br>
-                <input type="date" id="fechaCita" required>
-            </div><br>
+                <!-- Fila 3: Fecha y Hora -->
+                <div class="form-group">
+                    <label for="fechaCita">Fecha de atención</label>
+                    <input type="date" id="fechaCita" required>
+                </div>
 
-            <div>
-                <label for="horaCita">Hora:</label><br>
-                <input type="time" id="horaCita" required>
-            </div><br>
+                <div class="form-group">
+                    <label for="horaCita">Hora de atención</label>
+                    <select id="horaCita" required>
+                        <option value="">-- Seleccione un horario --</option>
+                        <option value="09:00">09:00 hrs</option>
+                        <option value="10:00">10:00 hrs</option>
+                        <option value="11:00">11:00 hrs</option>
+                        <option value="15:00">15:00 hrs</option>
+                        <option value="16:00">16:00 hrs</option>
+                    </select>
+                </div>
 
-            <div>
-                <label for="motivoCita">Motivo de la consulta:</label><br>
-                <textarea id="motivoCita" rows="3" placeholder="Ej: Control de peso, primera consulta vegetariana, etc."></textarea>
-            </div><br>
-
-            <button type="submit">Confirmar y Agendar Cita</button>
-        </form>
-
-        <!-- Mensajes dinámicos de éxito o error -->
-        <p id="mensajeError" style="color: red; font-weight: bold; margin-top: 15px;"></p>
-        <p id="mensajeExito" style="color: green; font-weight: bold; margin-top: 15px;"></p>
-
-        <hr>
-
-        <!-- Sección donde se verán las citas agendadas guardadas en localStorage -->
-        <h3>Mis Citas Agendadas</h3>
-        <div id="listaCitas"></div>
+                <!-- Botón de Envío -->
+                <div class="form-group full-width">
+                    <button type="submit" class="btn-submit-agendar">Confirmar Reserva</button>
+                </div>
+            </form>
+        </div>
     </main>
 
     <footer class="text-center py-4 border-top mt-5">
         <p class="mb-0">&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
 
+    <script src="navbar.js"></script>
     <script src="verificarSesion.js"></script>
-
     <script src="agendar.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
 </body>

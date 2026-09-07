@@ -35,32 +35,43 @@ let equipo = [
 ];
 
 // Función para renderizar el equipo en la vista
-function mostrarEquipo() {
-    let contenedor = document.getElementById("contenedorEquipo");
-    let html = "";
+function cargarEquipo() {
+    const contenedor = document.getElementById("contenedorNutricionistas");
+    if (!contenedor) return;
 
-    for (let i = 0; i < equipo.length; i++) {
-        let prof = equipo[i];
+    let html = "";
+    equipo.forEach((nutri, index) => {
         html += `
-            <div class="tarjeta-profesional" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-                <h3>${prof.nombre}</h3>
-                <p><strong>Especialidad:</strong> ${prof.especialidad}</p>
-                <p><strong>Formación:</strong> ${prof.titulo}</p>
-                <p><strong>Registro Minsal:</strong> ${prof.registro}</p>
-                <p>${prof.descripcion}</p>
-                <button type="button" onclick="agendarConProfesional('${prof.nombre}')">Agendar hora con este profesional</button>
+            <div class="tarjeta-nutri">
+                <h3>${nutri.nombre}</h3>
+                <img src="${nutri.foto}" alt="${nutri.nombre}" class="foto-nutri" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                <span class="especialidad-tag">${nutri.especialidad}</span>
+                
+                <div class="acciones-nutri">
+                    <button class="btn-detalle" onclick="verDescripcion(${index})">Ver descripción</button>
+                    <button class="btn-agendar-nutri" onclick="agendarCon('${nutri.codigo}')">Agendar Cita</button>
+                </div>
             </div>
         `;
-    }
+    });
 
     contenedor.innerHTML = html;
 }
 
-// Guarda la preferencia y redirige al formulario de reserva
-function agendarConProfesional(nombreNutricionista) {
-    localStorage.setItem("nutricionistaSeleccionado", nombreNutricionista);
+function verDescripcion(index) {
+    const nutri = nutricionistas[index];
+    document.getElementById("modalNombre").innerText = nutri.nombre;
+    document.getElementById("modalTexto").innerText = nutri.descripcion;
+    document.getElementById("modalDetalle").style.display = "flex";
+}
+
+function cerrarModal() {
+    document.getElementById("modalDetalle").style.display = "none";
+}
+
+function agendarCon(codigoNutri) {
+    localStorage.setItem("nutricionistaSeleccionado", codigoNutri);
     window.location.href = "agendar.html";
 }
 
-// Ejecución inicial al cargar el script
-mostrarEquipo();
+cargarEquipo();

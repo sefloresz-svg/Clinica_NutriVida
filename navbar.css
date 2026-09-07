@@ -1,60 +1,113 @@
-.navbar {
+/* Encabezado General */
+.header-principal {
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* 1. Nivel Superior (Logo + Nombre + Perfil) */
+.top-bar {
+    background-color: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1d52a0; 
-    padding: 12px 30px;
-    color: #ffffff;
+    padding: 12px 40px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-.logo-img {
-    height: 35px;
-    width: auto;
+.logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .brand-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #3b0764; /* Morado Oscuro */
+    letter-spacing: -0.5px;
 }
 
-.nav-links {
-    display: flex;
-    gap: 20px;
-}
-
-.nav-links a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-#seccion-usuario {
-    margin-left: auto;
-}
-
+/* Contenedor del Usuario (Derecha) */
 .user-session-container {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
+.avatar-silueta, .avatar-perfil {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f3e8ff;
+}
+
+.user-name {
+    color: #334155;
+    font-size: 0.95rem;
+}
+
 .btn-logout {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    padding: 6px 12px;
-    border-radius: 4px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 5px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 .btn-logout:hover {
-    background-color: #e74c3c;
-    border-color: #e74c3c;
+    background-color: #c0392b;
+}
+
+.btn-login {
+    background-color: #7c3aed; /* Morado Principal */
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+    background-color: #6d28d9;
+}
+
+/* 2. Nivel Inferior (Navegación Centrada) */
+.nav-bar {
+    background-color: #4c1d95; /* Morado Fondo Nav */
+    padding: 8px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.nav-links a:hover {
+    background-color: #7c3aed;
+    color: #ffffff;
 }

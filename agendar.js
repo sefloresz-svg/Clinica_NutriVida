@@ -1,14 +1,3 @@
-// Ejemplo para agendar.html o paginas privadas
-const sesion = JSON.parse(sessionStorage.getItem("sesionNutriVida"));
-
-if (!sesion) {
-    alert("Debes iniciar sesión para acceder a esta página.");
-    window.location.href = "login.html";
-} else if (sesion.rol !== "Usuario" && sesion.rol !== "Admin") {
-    alert("No tienes permiso para acceder a esta sección.");
-    window.location.href = "index.html";
-}
-
 // Data extraída del caso NutriVida
 let nutricionistas = [
     { codigo: "NUT001", nombre: "Nut. Carolina Fuentes M." },
