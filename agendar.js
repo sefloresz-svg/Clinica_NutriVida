@@ -13,11 +13,59 @@ let servicios = [
     { codigo: "EV001", nombre: "Antropometría completa ($18.000)" }
 ];
 
+const BLOQUES_HORARIOS = [
+    "08:00", "09:00", "10:00", "11:00", "12:00", 
+    "13:00", "14:00", "15:00", "16:00", "17:00"
+];
+
 document.addEventListener("DOMContentLoaded", function () {
+    configurarRestriccionesFecha();
     cargarOpcionesSelects();
+    cargarHorariosSelect();
     autocompletarDatos();
     mostrarCitasGuardadas();
 });
+
+// Valida únicamente el FORMATO: sin puntos y con guión (Ej: 12345678-9)
+function validarRut(rut) {
+    let regex = /^\d{7,8}-[0-9kK]$/;
+    return regex.test(rut.trim());
+}
+
+function configurarRestriccionesFecha() {
+    let inputFecha = document.getElementById("fechaCita");
+    if (!inputFecha) return;
+
+    let hoy = new Date().toISOString().split("T")[0];
+    inputFecha.setAttribute("min", hoy);
+
+    inputFecha.addEventListener("change", function () {
+        if (!this.value) return;
+        
+        const [year, month, day] = this.value.split('-').map(Number);
+        const fechaElegida = new Date(year, month - 1, day);
+        const diaSemana = fechaElegida.getDay();
+
+        let mensajeError = document.getElementById("mensajeError");
+
+        if (diaSemana === 0 || diaSemana === 6) {
+            if (mensajeError) mensajeError.textContent = "La clínica atiende solo de Lunes a Viernes. Elige un día hábil.";
+            this.value = "";
+        } else {
+            if (mensajeError) mensajeError.textContent = "";
+        }
+    });
+}
+
+function cargarHorariosSelect() {
+    let selectHora = document.getElementById("horaCita");
+    if (!selectHora) return;
+
+    selectHora.innerHTML = '<option value="">Seleccione hora</option>';
+    BLOQUES_HORARIOS.forEach(hora => {
+        selectHora.innerHTML += `<option value="${hora}">${hora} hrs</option>`;
+    });
+}
 
 function cargarOpcionesSelects() {
     let selectNutri = document.getElementById("selectNutricionista");
@@ -81,8 +129,14 @@ function validarYAgendar(event) {
         return;
     }
 
-    if (!servicio || !nutricionista) {
-        if (mensajeError) mensajeError.textContent = "Por favor seleccione un servicio y un nutricionista.";
+    // VALIDACIÓN DE FORMATO DE RUT
+    if (!validarRut(rut)) {
+        if (mensajeError) mensajeError.textContent = "Formato de RUT inválido. Debe ser sin puntos y con guión (Ej: 12345678-9).";
+        return;
+    }
+
+    if (!servicio || !nutricionista || !fecha || !hora) {
+        if (mensajeError) mensajeError.textContent = "Por favor completa todos los campos del formulario.";
         return;
     }
 
