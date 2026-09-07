@@ -3,6 +3,7 @@ let equipo = [
     {
         codigo: "NUT001",
         nombre: "Nut. Carolina Fuentes M.",
+        foto: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
         titulo: "Licenciada en Nutrición y Dietética, Universidad de La Frontera",
         especialidad: "Nutrición Clínica y Pérdida de Peso",
         registro: "RNPI-45821",
@@ -11,6 +12,7 @@ let equipo = [
     {
         codigo: "NUT002",
         nombre: "Nut. Rodrigo Sepúlveda A.",
+        foto: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", 
         titulo: "Master en Nutrición Deportiva",
         especialidad: "Rendimiento Deportivo y Antropometría ISAK II",
         registro: "RNPI-52109",
@@ -19,6 +21,7 @@ let equipo = [
     {
         codigo: "NUT003",
         nombre: "Nut. Daniela Morales C.",
+        foto: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", 
         titulo: "Diplomada en Alimentación Basada en Plantas",
         especialidad: "Alimentación Vegetariana y Vegana",
         registro: "RNPI-61430",
@@ -27,6 +30,7 @@ let equipo = [
     {
         codigo: "NUT004",
         nombre: "Nut. Felipe Araya R.",
+        foto: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
         titulo: "Especialista en Nutrición Metabólica y Pediátrica",
         especialidad: "Diabetes, Hipertensión y Salud Infantil",
         registro: "RNPI-39871",
@@ -59,7 +63,7 @@ function cargarEquipo() {
 }
 
 function verDescripcion(index) {
-    const nutri = nutricionistas[index];
+    const nutri = equipo[index];
     document.getElementById("modalNombre").innerText = nutri.nombre;
     document.getElementById("modalTexto").innerText = nutri.descripcion;
     document.getElementById("modalDetalle").style.display = "flex";

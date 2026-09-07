@@ -1,4 +1,3 @@
-// Data extraída del caso NutriVida
 let nutricionistas = [
     { codigo: "NUT001", nombre: "Nut. Carolina Fuentes M." },
     { codigo: "NUT002", nombre: "Nut. Rodrigo Sepúlveda A." },
@@ -14,51 +13,54 @@ let servicios = [
     { codigo: "EV001", nombre: "Antropometría completa ($18.000)" }
 ];
 
-// 1. Inicialización al cargar la página
 document.addEventListener("DOMContentLoaded", function () {
     cargarOpcionesSelects();
     autocompletarDatos();
     mostrarCitasGuardadas();
 });
 
-// Carga dinámicamente las opciones en los <select>
 function cargarOpcionesSelects() {
     let selectNutri = document.getElementById("selectNutricionista");
     let selectServ = document.getElementById("selectServicio");
+
+    if (!selectNutri || !selectServ) return;
+
+    selectNutri.innerHTML = '<option value="">Seleccione un profesional</option>';
+    selectServ.innerHTML = '<option value="">Seleccione un servicio</option>';
 
     for (let i = 0; i < nutricionistas.length; i++) {
         selectNutri.innerHTML += `<option value="${nutricionistas[i].nombre}">${nutricionistas[i].nombre}</option>`;
     }
 
     for (let i = 0; i < servicios.length; i++) {
-        selectServ.innerHTML += `<option value="${servicios[i].codigo}">${servicios[i].nombre}</option>`;
+        selectServ.innerHTML += `<option value="${servicios[i].nombre}">${servicios[i].nombre}</option>`;
     }
 
-    // Si viene desde "servicios.html", autoselecciona el servicio elegido
     let servicioElegido = localStorage.getItem("servicioSeleccionado");
     if (servicioElegido) {
-        selectServ.value = servicioElegido;
-        localStorage.removeItem("servicioSeleccionado"); // Limpia el temporal
+        let servEncontrado = servicios.find(s => s.codigo === servicioElegido);
+        if (servEncontrado) selectServ.value = servEncontrado.nombre;
+        localStorage.removeItem("servicioSeleccionado");
     }
-    // Para que el botón "Agendar hora con este profesional"
+
     let nutriElegido = localStorage.getItem("nutricionistaSeleccionado");
     if (nutriElegido) {
-        selectNutri.value = nutriElegido;
-        localStorage.removeItem("nutricionistaSeleccionado"); // Limpiar valor temporal
-}
-}
-
-// Autocompleta el nombre del usuario si está logueado
-function autocompletarDatos() {
-    let usuarioSesion = JSON.parse(localStorage.getItem("usuarioSesion"));
-    if (usuarioSesion && usuarioSesion.nombre) {
-        document.getElementById("nombrePaciente").value = usuarioSesion.nombre;
+        let nutriEncontrado = nutricionistas.find(n => n.codigo === nutriElegido);
+        if (nutriEncontrado) selectNutri.value = nutriEncontrado.nombre;
+        localStorage.removeItem("nutricionistaSeleccionado");
     }
 }
 
-// 2. Validación y Agendamiento
+function autocompletarDatos() {
+    let sesion = JSON.parse(sessionStorage.getItem("sesionNutriVida"));
+    let campoNombre = document.getElementById("nombrePaciente");
+    if (sesion && sesion.nombre && campoNombre) {
+        campoNombre.value = sesion.nombre;
+    }
+}
+
 function validarYAgendar(event) {
-    event.preventDefault(); // Evita recargar la página
+    event.preventDefault();
 
     let nombre = document.getElementById("nombrePaciente").value.trim();
     let rut = document.getElementById("rutPaciente").value.trim();
@@ -71,28 +73,21 @@ function validarYAgendar(event) {
     let mensajeError = document.getElementById("mensajeError");
     let mensajeExito = document.getElementById("mensajeExito");
 
-    mensajeError.textContent = "";
-    mensajeExito.textContent = "";
+    if (mensajeError) mensajeError.textContent = "";
+    if (mensajeExito) mensajeExito.textContent = "";
 
-    // VALIDACIÓN 1: Nombre con mínimo 3 caracteres
     if (nombre.length < 3) {
-        mensajeError.textContent = "El nombre del paciente debe tener al menos 3 caracteres.";
+        if (mensajeError) mensajeError.textContent = "El nombre del paciente debe tener al menos 3 caracteres.";
         return;
     }
 
-    // VALIDACIÓN 2: Fecha no sea anterior a hoy
-    let fechaSeleccionada = new Date(fecha);
-    let fechaActual = new Date();
-    fechaActual.setHours(0, 0, 0, 0);
-
-    if (fechaSeleccionada < fechaActual) {
-        mensajeError.textContent = "La fecha de la cita no puede ser una fecha pasada.";
+    if (!servicio || !nutricionista) {
+        if (mensajeError) mensajeError.textContent = "Por favor seleccione un servicio y un nutricionista.";
         return;
     }
 
-    // Objeto de la cita a guardar
     let nuevaCita = {
-        id: Date.now(), // ID único basado en tiempo
+        id: Date.now(),
         paciente: nombre,
         rut: rut,
         servicio: servicio,
@@ -103,40 +98,38 @@ function validarYAgendar(event) {
         estado: "Confirmada"
     };
 
-    // Guardar en LocalStorage (Arreglo de citas)
     let citasGuardadas = JSON.parse(localStorage.getItem("citas")) || [];
     citasGuardadas.push(nuevaCita);
     localStorage.setItem("citas", JSON.stringify(citasGuardadas));
 
-    // Feedback al usuario y limpieza del formulario
-    mensajeExito.textContent = "¡Cita agendada con éxito en Clínica NutriVida!";
+    if (mensajeExito) mensajeExito.textContent = "¡Cita agendada con éxito en Clínica NutriVida!";
+    
     document.getElementById("formAgendar").reset();
-    autocompletarDatos(); // Vuelve a rellenar el nombre del usuario logueado
-
+    autocompletarDatos();
     mostrarCitasGuardadas();
 }
 
-// 3. Renderizar el listado desde LocalStorage
 function mostrarCitasGuardadas() {
     let listaCitasDiv = document.getElementById("listaCitas");
+    if (!listaCitasDiv) return;
+
     let citasGuardadas = JSON.parse(localStorage.getItem("citas")) || [];
 
     if (citasGuardadas.length === 0) {
-        listaCitasDiv.innerHTML = "<p>No tienes citas agendadas actualmente.</p>";
+        listaCitasDiv.innerHTML = "<p class='text-muted'>No tienes citas agendadas actualmente.</p>";
         return;
     }
 
-    let html = "<ul>";
+    let html = "<ul class='list-group'>";
     for (let i = 0; i < citasGuardadas.length; i++) {
         let c = citasGuardadas[i];
         html += `
-            <li>
+            <li class='list-group-item mb-2 rounded border'>
                 <strong>Cita #${i + 1}</strong> - ${c.fecha} a las ${c.hora} hrs.<br>
                 <strong>Paciente:</strong> ${c.paciente} (${c.rut})<br>
                 <strong>Atiende:</strong> ${c.nutricionista}<br>
-                <strong>Servicio (Código):</strong> ${c.servicio}<br>
-                <button onclick="cancelarCita(${i})">Cancelar Cita</button>
-                <hr>
+                <strong>Servicio:</strong> ${c.servicio}<br>
+                <button class='btn btn-sm btn-outline-danger mt-2' onclick='cancelarCita(${i})'>Cancelar Cita</button>
             </li>
         `;
     }
@@ -144,23 +137,11 @@ function mostrarCitasGuardadas() {
     listaCitasDiv.innerHTML = html;
 }
 
-// Función para Eliminar del arreglo (Requisito CRUD)
 function cancelarCita(posicion) {
     let citasGuardadas = JSON.parse(localStorage.getItem("citas")) || [];
-    
     if (confirm("¿Estás seguro de que deseas cancelar esta cita?")) {
-        citasGuardadas.splice(posicion, 1); // Elimina de la posición
-        localStorage.setItem("citas", JSON.stringify(citasGuardadas)); // Actualiza localStorage
-        mostrarCitasGuardadas(); // Redibuja la vista
+        citasGuardadas.splice(posicion, 1);
+        localStorage.setItem("citas", JSON.stringify(citasGuardadas));
+        mostrarCitasGuardadas();
     }
-}
-
-function mostrarSeccion(idSeccion) {
-    // 1. Oculta todas las secciones
-    document.getElementById("sec-agendar").style.display = "none";
-    document.getElementById("sec-pacientes").style.display = "none";
-    document.getElementById("sec-admin").style.display = "none";
-
-    // 2. Muestra solo la que clickeaste
-    document.getElementById(idSeccion).style.display = "block";
 }

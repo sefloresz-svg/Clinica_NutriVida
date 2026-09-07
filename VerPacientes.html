@@ -5,295 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pacientes - Clínica NutriVida</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <script src="verificarSesion.js"></script>
-    <style>
-        :root {
-            --morado-oscuro: #4c1d95;
-            --morado-claro: #7c3aed;
-            --verde: #16a085;
-            --gris-fondo: #f8fafc;
-            --gris-texto: #475569;
-            --gris-borde: #e2e8f0;
-            --blanco: #ffffff;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f4f6;
-            color: #1f2937;
-        }
-
-        .nav-bar {
-            background-color: var(--morado-oscuro);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            background-color: rgba(255,255,255,0.12);
-        }
-
-        .header-principal {
-            width: 100%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .top-bar {
-            background: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 40px;
-            border-bottom: 1px solid var(--gris-borde);
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .brand-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #3b0764;
-        }
-
-        .user-name {
-            color: #334155;
-            font-weight: 600;
-        }
-
-        .btn-logout {
-            background: var(--danger);
-            color: #fff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .page-container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px 40px;
-        }
-
-        .titulo-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .titulo-panel h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .btn-primario {
-            background: var(--morado-claro);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 18px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .resumen-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(180px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
-        }
-
-        .card-stat {
-            background: white;
-            border: 1px solid var(--gris-borde);
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-        }
-
-        .card-stat .label {
-            color: var(--gris-texto);
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-        }
-
-        .card-stat .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0;
-        }
-
-        .panel {
-            background: #fff;
-            border: 1px solid var(--gris-borde);
-            border-radius: 18px;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-            overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 18px 22px;
-            border-bottom: 1px solid var(--gris-borde);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .panel-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .filtros {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filtros input, .filtros select {
-            border: 1px solid var(--gris-borde);
-            border-radius: 8px;
-            padding: 10px 12px;
-            min-width: 160px;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 14px 18px;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            font-weight: 700;
-        }
-
-        .activo { background: #dcfce7; color: #166534; }
-        .pendiente { background: #fef3c7; color: #92400e; }
-        .inactivo { background: #fee2e2; color: #991b1b; }
-
-        .acciones {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .mini-btn {
-            border: none;
-            border-radius: 8px;
-            padding: 7px 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .ver { background: #e0e7ff; color: #3730a3; }
-        .editar { background: #dcfce7; color: #166534; }
-        .eliminar { background: #fee2e2; color: #991b1b; }
-
-        footer {
-            margin-top: 32px;
-            text-align: center;
-            color: #64748b;
-            padding: 20px 0;
-        }
-
-        @media (max-width: 680px) {
-            .top-bar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px 20px;
-            }
-
-            .resumen-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .resumen-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="stiloPag.css">
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="verPacientes.css">
 </head>
 <body>
-    <nav class="nav-bar">
-        <div class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="servicios.html">Servicios</a>
-            <a href="equipo.html">Nuestros Nutricionistas</a>
-            <a href="agendar.html" data-rol="Paciente,Admin">Mis Citas / Agendar</a>
-            <a href="VerPacientes.html" data-rol="Nutricionista,Admin">Fichas de Pacientes</a>
-            <a href="administrador.html" data-rol="Admin">Panel de Administración</a>
-        </div>
-    </nav>
 
     <header class="header-principal">
         <div class="top-bar">
@@ -303,6 +19,16 @@
             </div>
             <div id="seccion-usuario"></div>
         </div>
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="equipo.html">Nuestros Nutricionistas</a>
+                <a href="agendar.html" data-rol="Paciente,Admin">Agendar Cita</a>
+                <a href="VerPacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+                <a href="administrador.html" data-rol="Admin">Panel Administración</a>
+            </div>
+        </nav>
     </header>
 
     <main class="page-container">
@@ -311,36 +37,11 @@
             <a href="agendar.html" class="btn-primario">+ Nueva cita</a>
         </div>
 
-        <section class="resumen-grid">
-            <div class="card-stat">
-                <div class="label">Total de pacientes</div>
-                <p class="value">186</p>
-            </div>
-            <div class="card-stat">
-                <div class="label">Este mes</div>
-                <p class="value">28</p>
-            </div>
-            <div class="card-stat">
-                <div class="label">Seguimiento activo</div>
-                <p class="value">142</p>
-            </div>
-            <div class="card-stat">
-                <div class="label">Pendientes</div>
-                <p class="value">16</p>
-            </div>
-        </section>
-
         <section class="panel">
             <div class="panel-header">
                 <h2>Listado de pacientes</h2>
                 <div class="filtros">
                     <input type="text" placeholder="Buscar paciente...">
-                    <select>
-                        <option>Todos</option>
-                        <option>Activos</option>
-                        <option>Pendientes</option>
-                        <option>Inactivos</option>
-                    </select>
                 </div>
             </div>
 
@@ -352,9 +53,7 @@
                             <th>RUT</th>
                             <th>Edad</th>
                             <th>Servicio</th>
-                            <th>Última visita</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -363,56 +62,7 @@
                             <td>12.345.678-9</td>
                             <td>34</td>
                             <td>Plan de pérdida de peso</td>
-                            <td>08/09/2026</td>
                             <td><span class="badge activo">Activo</span></td>
-                            <td>
-                                <div class="acciones">
-                                    <button class="mini-btn ver">Ver</button>
-                                    <button class="mini-btn editar">Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>José Torres</td>
-                            <td>18.736.441-5</td>
-                            <td>41</td>
-                            <td>Evaluación nutricional</td>
-                            <td>15/09/2026</td>
-                            <td><span class="badge pendiente">Pendiente</span></td>
-                            <td>
-                                <div class="acciones">
-                                    <button class="mini-btn ver">Ver</button>
-                                    <button class="mini-btn editar">Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Camila Rojas</td>
-                            <td>21.496.115-0</td>
-                            <td>29</td>
-                            <td>Nutrición deportiva</td>
-                            <td>02/09/2026</td>
-                            <td><span class="badge activo">Activo</span></td>
-                            <td>
-                                <div class="acciones">
-                                    <button class="mini-btn ver">Ver</button>
-                                    <button class="mini-btn editar">Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Renato Pino</td>
-                            <td>9.882.401-2</td>
-                            <td>52</td>
-                            <td>Control mensual</td>
-                            <td>01/09/2026</td>
-                            <td><span class="badge inactivo">Inactivo</span></td>
-                            <td>
-                                <div class="acciones">
-                                    <button class="mini-btn ver">Ver</button>
-                                    <button class="mini-btn editar">Editar</button>
-                                </div>
-                            </td>
                         </tr>
                     </tbody>
                 </table>

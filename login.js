@@ -1,8 +1,7 @@
 const USUARIOS = [
     { correo: "admin@nutrivida.cl", nombre: "Administrador General", rol: "Admin", clave: "1234" },
     { correo: "nutri@nutrivida.cl", nombre: "Dra. Carolina Fuentes", rol: "Nutricionista", clave: "1234" },
-    { correo: "usuario@nutrivida.cl", nombre: "Juan Pérez", rol: "Paciente", clave: "1234" },
-    { correo: "paciente@gmail.com", nombre: "Juan Pérez", rol: "Paciente", clave: "1234" }
+    { correo: "usuario@nutrivida.cl", nombre: "Juan Pérez", rol: "Paciente", clave: "1234" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     formLogin.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        // Busca los inputs por ID o por tipo de HTML para evitar fallos
         const inputCorreo = document.getElementById("email") || document.getElementById("correo") || document.querySelector('input[type="email"]');
         const inputClave = document.getElementById("password") || document.getElementById("clave") || document.querySelector('input[type="password"]');
 
