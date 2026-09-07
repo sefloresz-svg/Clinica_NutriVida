@@ -1,0 +1,40 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #2c3e50;
+    padding: 12px 24px;
+    color: white;
+}
+
+/* Empuja el contenedor del usuario totalmente a la derecha */
+#seccion-usuario {
+    margin-left: auto;
+}
+
+.user-session-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-name {
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+/* Botón Cerrar sesión */
+.btn-logout {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}

@@ -14,18 +14,6 @@
     <link rel="stylesheet" href="equipo.css">
 </head>
 <body>
-    <nav class="nav-bar">
-    <div class="nav-links">
-        <a href="index.html">Inicio</a>
-        <a href="servicios.html">Servicios</a>
-        <a href="equipo.html">Nuestros Nutricionistas</a>
-        
-        <!-- Opciones restringidas por rol -->
-        <a href="agendar.html" data-rol="Paciente,Admin">Mis Citas / Agendar</a>
-        <a href="VerPacientes.html" data-rol="Nutricionista,Admin">Fichas de Pacientes</a>
-        <a href="administrador.html" data-rol="Admin">Panel de Administración</a>
-    </div>
-</nav>
 
     <!-- Encabezado / Navbar -->
     <header class="header-principal">
@@ -47,8 +35,8 @@
                 <a href="servicios.html">Servicios</a>
                 <a href="equipo.html">Nuestros Nutricionistas</a>
                 <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
-                <a href="VerPacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
-                <a href="administrador.html" data-rol="Admin">Panel Administración</a>
+                <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+                <a href="gestion.html" data-rol="Admin">Panel Administración</a>
             </div>
         </nav>
     </header>
@@ -76,6 +64,6 @@
     <script src="verificarSesion.js"></script>
     <script src="equipo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="permisos.js"></script>
+
 </body>
 </html>

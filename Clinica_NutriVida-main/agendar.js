@@ -154,13 +154,3 @@ function cancelarCita(posicion) {
         mostrarCitasGuardadas(); // Redibuja la vista
     }
 }
-
-function mostrarSeccion(idSeccion) {
-    // 1. Oculta todas las secciones
-    document.getElementById("sec-agendar").style.display = "none";
-    document.getElementById("sec-pacientes").style.display = "none";
-    document.getElementById("sec-admin").style.display = "none";
-
-    // 2. Muestra solo la que clickeaste
-    document.getElementById(idSeccion).style.display = "block";
-}

@@ -1,0 +1,106 @@
+/* Contenedor Principal */
+.agendar-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Tarjeta del Formulario */
+.form-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: #3b0764; /* Morado marca */
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* Grilla en 2 Columnas */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+/* Estilos de Inputs, Selects y Datepicker */
+.form-group input,
+.form-group select {
+    padding: 12px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #334155;
+    background-color: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #7c3aed; /* Borde morado al hacer foco */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* Botón Verde Principal de Reserva */
+.btn-submit-agendar {
+    background-color: #10b981; /* Verde Esmeralda */
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-submit-agendar:hover {
+    background-color: #059669;
+}
+
+.btn-submit-agendar:active {
+    transform: scale(0.99);
+}
+
+/* Adaptabilidad a pantallas móviles */
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+}

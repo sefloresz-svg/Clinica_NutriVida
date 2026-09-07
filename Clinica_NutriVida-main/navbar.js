@@ -27,7 +27,3 @@ function cerrarSesion() {
     sessionStorage.removeItem("sesionNutriVida");
     window.location.href = "login.html";
 }
-
-// En navbar.js:
-'<a href="agendar.html">Ver Pacientes</a>'
-'<a href="agendar.html">Panel Administración</a>'

@@ -1,0 +1,121 @@
+/* Centrado total de la pantalla */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f3e8ff 0%, #eef2ff 100%);
+    min-height: 100vh;
+}
+
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Tarjeta flotante con sombra suave */
+.login-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(76, 29, 149, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.login-header h2 {
+    color: #3b0764; /* Morado marca */
+    font-size: 1.8rem;
+    margin: 0 0 8px 0;
+}
+
+.login-header h2 span {
+    color: #7c3aed; /* Morado claro */
+}
+
+.login-header p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Campos de entrada */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    padding: 12px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: #7c3aed;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* Botón de ingreso en Verde */
+.btn-login-submit {
+    width: 100%;
+    background-color: #10b981; /* Verde esmeralda */
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 5px;
+}
+
+.btn-login-submit:hover {
+    background-color: #059669;
+}
+
+.btn-login-submit:active {
+    transform: scale(0.99);
+}
+
+/* Enlace inferior */
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.login-footer a {
+    color: #7c3aed;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.login-footer a:hover {
+    color: #3b0764;
+    text-decoration: underline;
+}
