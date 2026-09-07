@@ -1,0 +1,19 @@
+header{
+    background-color: #2d70b4;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+}
+.arriba{
+    font-size: 20px;
+    color:black;
+    background-color: hsl(120, 11%, 96%);
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+.logo{
+    flex: 1;
+    width: 45px;
+    height: 45px;
+}

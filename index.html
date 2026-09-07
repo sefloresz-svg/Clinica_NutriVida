@@ -8,57 +8,41 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- Redirige inmediatamente a login.html si no hay sesión -->
     <script src="verificarSesion.js"></script>
+
+    <link rel="stylesheet" href="g.css">
     
-    <link rel="stylesheet" href="estilos.css">
 </head>
 
 <body>
 
-    <!-- Encabezado con información del usuario y botón activo -->
-    <header>
-        <h1>Clínica NutriVida</h1>
-        <div id="infoUsuario">
-            <span>Bienvenido/a, <strong id="nombreUsuario"></strong> (<span id="rolUsuario"></span>)</span>
-            <button type="button" onclick="cerrarSesionForzada()">Cerrar Sesión</button>
+    <!-- Encabezado / Navbar -->
+    <header class="navbar">
+
+        <!-- 1. Izquierda: Logo con Imagen + Nombre -->
+        <div class="logo-container">
+            <img src="img/Captura de pantalla 2026-09-06 231024.png" alt="Logo Clínica NutriVida" class="logo">
+            <span class="brand-name">Clínica NutriVida</span>
         </div>
+
+        <nav class="nav-links">
+            <!-- Visto por todos -->
+            <a href="index.html" class="arriba">Inicio</a>
+            <a href="servicios.html" class="arriba">Servicios</a>
+
+            <!-- Solo accesible por Usuarios normales y Administradores -->
+            <a href="agendar.html" class="arriba" data-rol="Usuario,Admin">Agendar Cita</a>
+
+            <!-- Solo visto por el Nutricionista y Admin -->
+            <a href="pacientes.html" class="arriba" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+
+            <!-- Solo visto por el Administrador -->
+            <a href="gestion.html" class="arriba" data-rol="Admin">Panel Administración</a>
+        </nav>
+
+        <!-- Barra de usuario a la extrema derecha -->
+        <div id="seccion-usuario"></div>
     </header>
-
-    <!-- Menú de navegación principal -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                <a class="nav-link" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="servicios.html">Servicio y Planes</a>
-                </li>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="agendar.html">Agendar Cita</a>
-                </li>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="equipo.html">Nuestros Nutricionistas</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li>
-            </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-            </div>
-        </div>
-    </nav>
-
-    
+   
     <!-- Contenido Principal Centrado -->
     <main class="container text-center my-auto">
         <h1 class="display-6 fw-bold mb-3">Asesoría Nutricional Personalizada en Temuco</h1>
@@ -77,29 +61,8 @@
         <p class="mb-0">&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
 
-    <!-- Script de carga de datos y función de salida -->
-    <script>
-        // 1. Cargar nombre y rol del usuario logueado
-        try {
-            let usuarioSesion = JSON.parse(localStorage.getItem("usuarioSesion"));
-            if (usuarioSesion) {
-                if (document.getElementById("nombreUsuario")) {
-                    document.getElementById("nombreUsuario").textContent = usuarioSesion.nombre;
-                }
-                if (document.getElementById("rolUsuario")) {
-                    document.getElementById("rolUsuario").textContent = usuarioSesion.rol;
-                }
-            }
-        } catch (e) {
-            console.error("Error al leer la sesión:", e);
-        }
-
-        // 2. Función global para cerrar sesión
-        function cerrarSesionForzada() {
-            localStorage.clear();
-            window.location.replace("login.html");
-        }
-    </script>
+    <!-- Importar el script en todas las páginas -->
+    <script src="verificarSesion.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>

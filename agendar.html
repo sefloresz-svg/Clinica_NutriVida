@@ -13,38 +13,30 @@
 </head>
 <body>
 
-    <header>
-        <!-- Menú de navegación principal -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="servicios.html">Servicio y Planes</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="agendar.html">Agendar Cita</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="equipo.html">Nuestros Nutricionistas</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                    </li>
-                </ul>
-         
-    </header>
+    <!-- Encabezado / Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html"><strong>Clínica NutriVida</strong></a>
+        </div>
 
-    <h1>Clínica NutriVida</h1>
+        <nav class="nav-links">
+            <!-- Visto por todos -->
+            <a href="index.html">Inicio</a>
+            <a href="servicios.html">Servicios</a>
+
+            <!-- Solo accesible por Usuarios normales y Administradores -->
+            <a href="agendar.html" data-rol="Usuario,Admin">Agendar Cita</a>
+
+            <!-- Solo visto por el Nutricionista y Admin -->
+            <a href="pacientes.html" data-rol="Nutricionista,Admin">Ver Pacientes</a>
+
+            <!-- Solo visto por el Administrador -->
+            <a href="gestion.html" data-rol="Admin">Panel Administración</a>
+        </nav>
+
+        <!-- Barra de usuario a la extrema derecha -->
+        <div id="seccion-usuario"></div>
+    </header>
 
     <main>
         <h2>Reserva tu Hora de Atención</h2>
@@ -111,6 +103,8 @@
     <footer class="text-center py-4 border-top mt-5">
         <p class="mb-0">&copy; 2026 Clínica NutriVida - Temuco, Región de La Araucanía</p>
     </footer>
+
+    <script src="verificarSesion.js"></script>
 
     <script src="agendar.js"></script>
 
