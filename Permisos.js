@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sesion = JSON.parse(sesionGuardada);
 
-    // 2. Control de accesos según la matriz RBAC
+    // 2. Control de acceso/permisos
     const permisosPaginas = {
         "gestion.html": ["Admin"],
         "administrador.html": ["Admin"],

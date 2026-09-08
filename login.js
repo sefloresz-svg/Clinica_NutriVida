@@ -11,28 +11,31 @@ document.addEventListener("DOMContentLoaded", () => {
     formLogin.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const inputCorreo = document.getElementById("email") || document.getElementById("correo") || document.querySelector('input[type="email"]');
-        const inputClave = document.getElementById("password") || document.getElementById("clave") || document.querySelector('input[type="password"]');
+        // 1. Capturamos los campos soportando tanto 'correo'/'email' como 'clave'/'password'
+        const inputCorreo = document.getElementById("correo") || document.getElementById("email");
+        const inputClave = document.getElementById("clave") || document.getElementById("password");
 
         if (!inputCorreo || !inputClave) {
-            alert("Error: No se encontraron los campos en el formulario.");
+            alert("Error: Revisa los IDs de tus campos en el HTML.");
             return;
         }
 
         const correo = inputCorreo.value.trim().toLowerCase();
         const clave = inputClave.value.trim();
 
-        const usuario = USUARIOS.find(u => u.correo.toLowerCase() === correo && u.clave === clave);
+        // 2. Obtenemos la lista de usuarios (sea de la variable global o de localStorage)
+        const listaUsuarios = (typeof USUARIOS !== "undefined") 
+            ? USUARIOS 
+            : JSON.parse(localStorage.getItem("usuarios NutriVida")) || JSON.parse(localStorage.getItem("usuarios")) || [];
+
+        // 3. Validamos las credenciales
+        const usuario = listaUsuarios.find(u => u.correo.toLowerCase() === correo && u.clave === clave);
 
         if (usuario) {
-            sessionStorage.setItem("sesionNutriVida", JSON.stringify({
-                nombre: usuario.nombre,
-                rol: usuario.rol,
-                correo: usuario.correo
-            }));
+            sessionStorage.setItem("sesionNutriVida", JSON.stringify(usuario));
             window.location.href = "index.html";
         } else {
-            alert("Correo o contraseña incorrectos.\nPrueba con: admin@nutrivida.cl / 1234");
+            alert("Correo o contraseña incorrectos.");
         }
     });
 });
