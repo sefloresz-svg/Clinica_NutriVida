@@ -15,9 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. Control de acceso/permisos
     const permisosPaginas = {
-        "gestion.html": ["Admin"],
         "administrador.html": ["Admin"],
-        "pacientes.html": ["Admin", "Nutricionista"],
         "VerPacientes.html": ["Admin", "Nutricionista"],
         "agendar.html": ["Admin", "Paciente"]
     };
