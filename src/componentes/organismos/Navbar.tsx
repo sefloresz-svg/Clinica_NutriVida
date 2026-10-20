@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import logo from "../../assets/Captura_de_pantalla_2026-09-06_231024.png";
+
 function Navbar() {
   const navigate = useNavigate();
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
@@ -16,7 +18,12 @@ function Navbar() {
       <div className="header-top py-2 border-bottom bg-white">
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/" className="d-flex align-items-center text-decoration-none">
-            <span className="fs-3 me-2">🌱</span>
+            <img 
+              src={logo} 
+              alt="Logo Clínica NutriVida" 
+              className="me-2" 
+              style={{ height: "40px", width: "auto", objectFit: "contain" }} 
+            />
             <span className="fs-4 fw-bold text-dark">
               Clínica <span style={{ color: "#521d91" }}>NutriVida</span>
             </span>
