@@ -78,8 +78,9 @@ function Agendar() {
   const [hora, setHora] = useState("");
   const [motivo, setMotivo] = useState("");
 
+  // Usar sessionStorage para mantener las citas únicamente en la sesión actual
   const [citas, setCitas] = useState<Cita[]>(() => {
-    const guardadas = localStorage.getItem("citasNutriVida");
+    const guardadas = sessionStorage.getItem("citasNutriVida");
     return guardadas ? JSON.parse(guardadas) : [];
   });
 
@@ -95,7 +96,7 @@ function Agendar() {
   // Cambiar nutricionista y reiniciar la hora seleccionada
   const manejarCambioNutricionista = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNutricionista(e.target.value);
-    setHora(""); // Reinicia la hora seleccionada para evitar incongruencias
+    setHora("");
   };
 
   // Manejar selección de fecha
@@ -122,18 +123,16 @@ function Agendar() {
     }
 
     setFecha(fechaSeleccionada);
-    setHora(""); // Reiniciar hora al cambiar la fecha
+    setHora("");
   };
 
-  // Calcular las horas disponibles filtrando los horarios ocupados para esa fecha/especialista
+  // Calcular horas disponibles filtrando reservas existentes en sessionStorage
   const obtenerHorariosDisponibles = (): string[] => {
     if (!nutricionista) return [];
 
     const horariosBase = HORARIOS_POR_NUTRICIONISTA[nutricionista] || [];
-
     if (!fecha) return horariosBase;
 
-    // Filtrar horas que ya estén reservadas para ese nutricionista en la fecha elegida
     const horasOcupadas = citas
       .filter((c) => c.nutricionista === nutricionista && c.fecha === fecha)
       .map((c) => c.hora);
@@ -191,7 +190,7 @@ function Agendar() {
 
     const listaActualizada = [...citas, nuevaCita];
     setCitas(listaActualizada);
-    localStorage.setItem("citasNutriVida", JSON.stringify(listaActualizada));
+    sessionStorage.setItem("citasNutriVida", JSON.stringify(listaActualizada));
 
     alert("¡Cita agendada exitosamente!");
 
@@ -213,7 +212,7 @@ function Agendar() {
         Reserva de Cita Nutricional
       </h2>
 
-      <div className="row g-4">
+      <div className="row g-4 mb-5">
         {/* Formulario de Agendamiento */}
         <div className="col-md-7">
           <div className="card card-nutri p-4 shadow-sm">

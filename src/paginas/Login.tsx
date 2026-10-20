@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const USUARIOS = [
@@ -14,6 +14,7 @@ function Login() {
 
   const manejarEnvio = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!correo.trim() || !clave.trim()) {
       alert("Por favor, ingrese su correo y contraseña.");
       return;
@@ -26,7 +27,13 @@ function Login() {
     if (usuarioEncontrado) {
       sessionStorage.setItem("sesionNutriVida", JSON.stringify(usuarioEncontrado));
       alert(`¡Bienvenido/a ${usuarioEncontrado.nombre}!`);
-      navigate("/agendar");
+
+      // Redirección inteligente: los profesionales van a Pacientes, el paciente a Agendar
+      if (usuarioEncontrado.rol === "Nutricionista" || usuarioEncontrado.rol === "Admin") {
+        navigate("/pacientes");
+      } else {
+        navigate("/agendar");
+      }
     } else {
       alert("Correo o contraseña incorrectos.");
     }
@@ -39,6 +46,7 @@ function Login() {
           Clínica <span style={{ color: "#6b21a8" }}>NutriVida</span>
         </h2>
         <p className="text-muted small mb-4">Ingresa a tu cuenta para gestionar tus citas</p>
+
         <form onSubmit={manejarEnvio} className="text-start">
           <div className="mb-3">
             <label className="form-label fw-bold text-dark small">Correo Electrónico</label>
@@ -50,6 +58,7 @@ function Login() {
               onChange={(e) => setCorreo(e.target.value)}
             />
           </div>
+
           <div className="mb-4">
             <label className="form-label fw-bold text-dark small">Contraseña</label>
             <input
@@ -60,10 +69,12 @@ function Login() {
               onChange={(e) => setClave(e.target.value)}
             />
           </div>
+
           <button type="submit" className="btn w-100 py-2 fw-bold text-white rounded-3" style={{ backgroundColor: "#10b981" }}>
             Ingresar
           </button>
         </form>
+
         <div className="mt-4">
           <Link to="/" className="text-decoration-none text-muted small">
             ← Volver al sitio principal
