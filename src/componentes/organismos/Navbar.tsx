@@ -89,6 +89,16 @@ function Navbar() {
                 Ver Pacientes
               </Link>
             )}
+
+            {sesion?.rol === "Admin" && (
+              <Link
+                to="/administrador"
+                className="text-white text-decoration-none small fw-bold border-bottom border-2 border-white pb-1"
+              >
+                Panel Administración
+              </Link>
+            )}
+
           </div>
         </div>
       </nav>

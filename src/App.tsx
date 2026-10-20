@@ -8,6 +8,7 @@ import Agendar from "./paginas/Agendar";
 import Login from "./paginas/Login";
 import Pacientes from "./paginas/Pacientes";
 import Footer from "./componentes/organismos/Footer";
+import Administrador from "./paginas/Administrador";
 
 function App() {
   const location = useLocation();
@@ -29,6 +30,8 @@ function App() {
           <Route path="/agendar" element={<Agendar />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pacientes" element={<Pacientes />} />
+
+          <Route path="/administrador" element={<Administrador />} />
 
         </Routes>
       </main>
