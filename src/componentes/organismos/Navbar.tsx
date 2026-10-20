@@ -1,8 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
+
  const navigate = useNavigate();
+
  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+
  const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
+ 
  const cerrarSesion = () => {
  sessionStorage.removeItem("sesionNutriVida");
  navigate("/");
