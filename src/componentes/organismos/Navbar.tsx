@@ -22,7 +22,12 @@ function Navbar() {
               src={logo} 
               alt="Logo Clínica NutriVida" 
               className="me-2" 
-              style={{ height: "40px", width: "auto", objectFit: "contain" }} 
+              style={{ 
+                width: "45px", 
+                height: "45px", 
+                borderRadius: "50%", 
+                objectFit: "cover" 
+              }} 
             />
             <span className="fs-4 fw-bold text-dark">
               Clínica <span style={{ color: "#521d91" }}>NutriVida</span>
