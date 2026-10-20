@@ -5,9 +5,9 @@ function Nutricionistas() {
 
   const equipo = [
     { nombre: "Nut. Carolina Fuentes M.", esp: "Nutrición Clínica y Pérdida de Peso", img: "https://randomuser.me/api/portraits/women/44.jpg" },
-    { nombre: "Nut. Rodrigo Sepúlveda A.", esp: "Rendimiento Deportivo y Antropometría ISAK II", img: "/img/rodrigo.jpg" },
+    { nombre: "Nut. Rodrigo Sepúlveda A.", esp: "Rendimiento Deportivo y Antropometría ISAK II", img: "/img/Rodrigo.jpg" },
     { nombre: "Nut. Daniela Morales C.", esp: "Alimentación Vegetariana y Vegana", img: "https://randomuser.me/api/portraits/women/68.jpg" },
-    { nombre: "Nut. Felipe Araya R.", esp: "Diabetes, Hipertensión y Salud Infantil", img: "/img/felipe.jpg" }
+    { nombre: "Nut. Felipe Araya R.", esp: "Diabetes, Hipertensión y Salud Infantil", img: "/img/Felipe.jpg" }
   ];
 
   return (
