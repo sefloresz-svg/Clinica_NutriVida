@@ -22,7 +22,7 @@ function Navbar() {
 
           <Link to="/" className="d-flex align-items-center text-decoration-none">
 
-            <span className="fs-3 me-2">🌱</span>
+            <img src={logo} alt="Logo Clínica NutriVida" height="48" className="me-2" />
             <span className="fs-4 fw-bold text-dark">
               Clínica <span style={{ color: "#521d91" }}>NutriVida</span>
             </span>
