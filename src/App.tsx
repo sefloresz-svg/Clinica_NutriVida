@@ -7,6 +7,7 @@ import Nutricionistas from "./paginas/Nutricionistas";
 import Agendar from "./paginas/Agendar";
 import Login from "./paginas/Login";
 import Pacientes from "./paginas/Pacientes";
+import Footer from "./componentes/organismos/Footer";
 
 function App() {
   const location = useLocation();
@@ -14,18 +15,25 @@ function App() {
   const esPaginaLogin = location.pathname === "/login";
 
   return (
-    <div>
+    <div className="d-flex flex-column min-vh-100">
+      
       {!esPaginaLogin && <Navbar />}
 
-      <Routes>
-        <Route path="/" element={<Inicio />} />
-        <Route path="/novedades" element={<Novedades />} />
-        <Route path="/servicios" element={<Servicios />} />
-        <Route path="/nutricionistas" element={<Nutricionistas />} />
-        <Route path="/agendar" element={<Agendar />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/pacientes" element={<Pacientes />} />
-      </Routes>
+      <main className="flex-grow-1">
+        <Routes>
+
+          <Route path="/" element={<Inicio />} />
+          <Route path="/novedades" element={<Novedades />} />
+          <Route path="/servicios" element={<Servicios />} />
+          <Route path="/nutricionistas" element={<Nutricionistas />} />
+          <Route path="/agendar" element={<Agendar />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/pacientes" element={<Pacientes />} />
+
+        </Routes>
+      </main>
+
+      {!esPaginaLogin && <Footer />}
     </div>
   );
 }
