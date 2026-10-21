@@ -5,7 +5,7 @@ interface Usuario {
   id: number;
   nombre: string;
   correoOrRut: string;
-  rol: string;
+  rol: "Admin" | "Nutricionista" | "Paciente";
   estado: "Activo" | "Inactivo";
 }
 
@@ -13,8 +13,7 @@ function Administrador() {
   const navigate = useNavigate();
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
 
-  // 🔒 CONTROL DE ACCESO EXCLUSIVO
-  // Verifica que exista una sesión activa y que el rol sea exactamente 'Admin'
+  // 🔒 Control de acceso exclusivo para rol 'Admin'
   useEffect(() => {
     if (!sesionGuardada) {
       alert("Debes iniciar sesión para acceder al panel administrativo.");
@@ -29,44 +28,66 @@ function Administrador() {
     }
   }, [sesionGuardada, navigate]);
 
-  // Datos mock iniciales idénticos a los de la imagen
-  const [usuarios, setUsuarios] = useState<Usuario[]>([
-    {
-      id: 1,
-      nombre: "Administrador General",
-      correoOrRut: "admin@nutrivida.cl",
-      rol: "Admin",
-      estado: "Activo",
-    },
-    {
-      id: 2,
-      nombre: "Nut. Carolina Fuentes",
-      correoOrRut: "cfuentes@nutrivida.cl",
-      rol: "Nutricionista",
-      estado: "Activo",
-    },
-    {
-      id: 3,
-      nombre: "Juan Pérez",
-      correoOrRut: "12345678-9",
-      rol: "Paciente",
-      estado: "Activo",
-    },
-  ]);
+  // Cargar usuarios desde sessionStorage o usar los iniciales
+  const [usuarios, setUsuarios] = useState<Usuario[]>(() => {
+    const guardados = sessionStorage.getItem("usuariosNutriVida");
+    if (guardados) {
+      try {
+        return JSON.parse(guardados);
+      } catch (e) {
+        console.error("Error al parsear usuarios guardados:", e);
+      }
+    }
+    return [
+      {
+        id: 1,
+        nombre: "Administrador General",
+        correoOrRut: "admin@nutrivida.cl",
+        rol: "Admin",
+        estado: "Activo",
+      },
+      {
+        id: 2,
+        nombre: "Nut. Carolina Fuentes",
+        correoOrRut: "cfuentes@nutrivida.cl",
+        rol: "Nutricionista",
+        estado: "Activo",
+      },
+      {
+        id: 3,
+        nombre: "Juan Pérez",
+        correoOrRut: "12345678-9",
+        rol: "Paciente",
+        estado: "Activo",
+      },
+    ];
+  });
 
-  // Si no cumple los permisos, evita renderizar la interfaz antes de redirigir
+  // Guardar en sessionStorage automáticamente al crear o modificar un usuario
+  useEffect(() => {
+    sessionStorage.setItem("usuariosNutriVida", JSON.stringify(usuarios));
+  }, [usuarios]);
+
+  // Estado para controlar la visibilidad del formulario emergente (Modal)
+  const [mostrarModal, setMostrarModal] = useState(false);
+
+  // Estados de los campos del formulario
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoCorreoRut, setNuevoCorreoRut] = useState("");
+  const [nuevoRol, setNuevoRol] = useState<"Admin" | "Nutricionista" | "Paciente">("Paciente");
+
   if (!sesionGuardada) return null;
   const sesion = JSON.parse(sesionGuardada);
   if (sesion.rol !== "Admin") return null;
 
-  // Función para cambiar el rol de un usuario desde la tabla
-  const manejarCambioRol = (id: number, nuevoRol: string) => {
+  // Cambiar rol de un usuario existente
+  const manejarCambioRol = (id: number, rolActualizado: "Admin" | "Nutricionista" | "Paciente") => {
     setUsuarios(
-      usuarios.map((u) => (u.id === id ? { ...u, rol: nuevoRol } : u))
+      usuarios.map((u) => (u.id === id ? { ...u, rol: rolActualizado } : u))
     );
   };
 
-  // Función para Activar/Desactivar usuarios
+  // Alternar estado Activo / Inactivo
   const alternarEstado = (id: number) => {
     setUsuarios(
       usuarios.map((u) =>
@@ -77,9 +98,36 @@ function Administrador() {
     );
   };
 
+  // Función ejecutada al enviar el formulario
+  const manejarCrearUsuario = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!nuevoNombre.trim() || !nuevoCorreoRut.trim()) {
+      alert("Por favor completa el nombre y el correo/RUT.");
+      return;
+    }
+
+    const usuarioNuevo: Usuario = {
+      id: Date.now(),
+      nombre: nuevoNombre.trim(),
+      correoOrRut: nuevoCorreoRut.trim(),
+      rol: nuevoRol,
+      estado: "Activo",
+    };
+
+    // Agregar el nuevo usuario a la lista
+    setUsuarios([...usuarios, usuarioNuevo]);
+
+    // Limpiar inputs y cerrar el formulario emergente
+    setNuevoNombre("");
+    setNuevoCorreoRut("");
+    setNuevoRol("Paciente");
+    setMostrarModal(false);
+  };
+
   return (
     <div className="container my-4">
-      {/* 1. Banner Principal Púrpura */}
+      {/* Banner Superior */}
       <div
         className="p-4 p-md-5 rounded-4 text-white mb-4 shadow-sm"
         style={{ backgroundColor: "#6b21a8" }}
@@ -90,9 +138,8 @@ function Administrador() {
         </p>
       </div>
 
-      {/* 2. Tarjetas de Métricas (KPIs) */}
+      {/* Tarjetas Informativas */}
       <div className="row g-3 mb-4">
-        {/* Citas hoy */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
             <span className="text-muted small fw-bold mb-1">Citas hoy</span>
@@ -101,7 +148,6 @@ function Administrador() {
           </div>
         </div>
 
-        {/* Pacientes activos */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
             <span className="text-muted small fw-bold mb-1">Pacientes activos</span>
@@ -110,7 +156,6 @@ function Administrador() {
           </div>
         </div>
 
-        {/* Ingresos mes */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
             <span className="text-muted small fw-bold mb-1">Ingresos mes</span>
@@ -119,7 +164,6 @@ function Administrador() {
           </div>
         </div>
 
-        {/* Consultas online */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
             <span className="text-muted small fw-bold mb-1">Consultas online</span>
@@ -129,7 +173,7 @@ function Administrador() {
         </div>
       </div>
 
-      {/* 3. Sección Gestión de Usuarios y Roles */}
+      {/* Tabla de Usuarios y Roles */}
       <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
           <div>
@@ -138,20 +182,21 @@ function Administrador() {
               Crear, editar roles y activar/desactivar acceso a usuarios.
             </p>
           </div>
+          
+          {/* BOTÓN CREAR USUARIO QUE ACTIVA EL FORMULARIO */}
           <button
             className="btn text-white rounded-3 px-3 py-2 fw-bold text-nowrap"
             style={{ backgroundColor: "#6b21a8" }}
-            onClick={() => alert("Formulario para crear un nuevo usuario.")}
+            onClick={() => setMostrarModal(true)}
           >
             + Crear Usuario
           </button>
         </div>
 
-        {/* Tabla de Usuarios */}
         <div className="table-responsive">
           <table className="table align-middle mb-0">
             <thead>
-              <tr className="border-bottom">
+              <tr className="border-bottom text-uppercase">
                 <th className="text-muted small fw-bold py-3">NOMBRE</th>
                 <th className="text-muted small fw-bold py-3">CORREO / RUT</th>
                 <th className="text-muted small fw-bold py-3">ROL ASIGNADO</th>
@@ -168,7 +213,12 @@ function Administrador() {
                     <select
                       className="form-select form-select-sm border-secondary-subtle"
                       value={u.rol}
-                      onChange={(e) => manejarCambioRol(u.id, e.target.value)}
+                      onChange={(e) =>
+                        manejarCambioRol(
+                          u.id,
+                          e.target.value as "Admin" | "Nutricionista" | "Paciente"
+                        )
+                      }
                     >
                       <option value="Admin">Admin</option>
                       <option value="Nutricionista">Nutricionista</option>
@@ -204,6 +254,100 @@ function Administrador() {
           </table>
         </div>
       </div>
+
+      {/* FORMULARIO EMERGENTE (MODAL CON INPUTS) */}
+      {mostrarModal && (
+        <div
+          className="modal d-block"
+          tabIndex={-1}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.55)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content rounded-4 border-0 p-3 shadow-lg">
+              <div className="modal-header border-0 pb-0">
+                <h5 className="modal-title fw-bold text-dark">Crear Nuevo Usuario</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setMostrarModal(false)}
+                ></button>
+              </div>
+
+              <form onSubmit={manejarCrearUsuario}>
+                <div className="modal-body">
+                  {/* Input Nombre */}
+                  <div className="mb-3">
+                    <label className="form-label small fw-bold text-muted mb-1">
+                      Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control rounded-3"
+                      placeholder="Ej: Dra. María López"
+                      value={nuevoNombre}
+                      onChange={(e) => setNuevoNombre(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Input Correo / RUT */}
+                  <div className="mb-3">
+                    <label className="form-label small fw-bold text-muted mb-1">
+                      Correo Electrónico o RUT
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control rounded-3"
+                      placeholder="mlopez@nutrivida.cl o 12345678-9"
+                      value={nuevoCorreoRut}
+                      onChange={(e) => setNuevoCorreoRut(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Selector Rol */}
+                  <div className="mb-3">
+                    <label className="form-label small fw-bold text-muted mb-1">
+                      Rol Asignado
+                    </label>
+                    <select
+                      className="form-select rounded-3"
+                      value={nuevoRol}
+                      onChange={(e) =>
+                        setNuevoRol(
+                          e.target.value as "Admin" | "Nutricionista" | "Paciente"
+                        )
+                      }
+                    >
+                      <option value="Paciente">Paciente</option>
+                      <option value="Nutricionista">Nutricionista</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Botones de acción del formulario */}
+                <div className="modal-footer border-0 pt-0">
+                  <button
+                    type="button"
+                    className="btn btn-light rounded-3 px-3 fw-semibold"
+                    onClick={() => setMostrarModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn text-white rounded-3 px-4 fw-bold"
+                    style={{ backgroundColor: "#6b21a8" }}
+                  >
+                    Guardar Usuario
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
