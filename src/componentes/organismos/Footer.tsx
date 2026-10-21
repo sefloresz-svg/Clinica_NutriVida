@@ -1,16 +1,17 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Footer() {
-  const location = useLocation();
+  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+  const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
-  // Detectar si el usuario está en el Panel de Administración
-  const esVistaAdmin = location.pathname === "/administrador";
+  // 🔹 Si el rol activo es Admin, el footer se vuelve oscuro
+  const esAdmin = sesion?.rol === "Admin";
 
   return (
     <footer
       className="mt-auto py-4 text-white"
       style={{
-        backgroundColor: esVistaAdmin ? "#0f172a" : "#3f1473",
+        backgroundColor: esAdmin ? "#0f172a" : "#3f1473",
         transition: "background-color 0.3s ease",
       }}
     >
@@ -21,9 +22,9 @@ function Footer() {
           <div className="col-md-4">
             <h5 className="fw-bold text-white mb-3 d-flex align-items-center gap-2">
               Clínica NutriVida
-              {esVistaAdmin && (
+              {esAdmin && (
                 <span className="badge bg-primary text-uppercase fs-7 px-2 py-1">
-                  Admin
+                  Admin Mode
                 </span>
               )}
             </h5>
@@ -39,7 +40,9 @@ function Footer() {
               <li><Link to="/" className="text-white text-decoration-none opacity-75 opacity-100-hover">Inicio</Link></li>
               <li><Link to="/novedades" className="text-white text-decoration-none opacity-75 opacity-100-hover">Novedades</Link></li>
               <li><Link to="/servicios" className="text-white text-decoration-none opacity-75 opacity-100-hover">Servicios</Link></li>
-              <li><Link to="/agendar" className="text-white text-decoration-none opacity-75 opacity-100-hover">Agendar Cita</Link></li>
+              {(!sesion || sesion.rol === "Paciente") && (
+                <li><Link to="/agendar" className="text-white text-decoration-none opacity-75 opacity-100-hover">Agendar Cita</Link></li>
+              )}
             </ul>
           </div>
 

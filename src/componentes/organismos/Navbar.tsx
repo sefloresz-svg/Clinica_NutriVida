@@ -8,8 +8,8 @@ function Navbar() {
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
-  // Detectar si estamos dentro del panel de administración
-  const esVistaAdmin = location.pathname === "/administrador";
+  // 🔹 La clave: Si el rol es Admin, activa el estilo ejecutivo en TODO el sitio
+  const esAdmin = sesion?.rol === "Admin";
 
   const cerrarSesion = () => {
     sessionStorage.removeItem("sesionNutriVida");
@@ -25,9 +25,11 @@ function Navbar() {
 
   return (
     <header className="mb-0">
-      {/* Cabecera superior */}
-      <div className={`header-top py-2 border-bottom ${esVistaAdmin ? "bg-slate-900 text-white" : "bg-white"}`}
-           style={{ backgroundColor: esVistaAdmin ? "#0f172a" : "#ffffff" }}>
+      {/* Cabecera superior: Oscura si es Admin, Blanca si es Paciente/Nutri */}
+      <div 
+        className="header-top py-2 border-bottom"
+        style={{ backgroundColor: esAdmin ? "#0f172a" : "#ffffff" }}
+      >
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/" className="d-flex align-items-center text-decoration-none">
             <img 
@@ -41,10 +43,10 @@ function Navbar() {
                 objectFit: "cover" 
               }} 
             />
-            <span className={`fs-4 fw-bold ${esVistaAdmin ? "text-white" : "text-dark"}`}>
-              Clínica <span style={{ color: esVistaAdmin ? "#38bdf8" : "#521d91" }}>NutriVida</span>
+            <span className={`fs-4 fw-bold ${esAdmin ? "text-white" : "text-dark"}`}>
+              Clínica <span style={{ color: esAdmin ? "#38bdf8" : "#521d91" }}>NutriVida</span>
             </span>
-            {esVistaAdmin && (
+            {esAdmin && (
               <span className="badge bg-primary ms-3 text-uppercase px-2 py-1 fs-7">
                 Console Admin
               </span>
@@ -54,7 +56,7 @@ function Navbar() {
           <div>
             {sesion ? (
               <div className="d-flex align-items-center gap-3">
-                <span className={`small fw-bold ${esVistaAdmin ? "text-light" : "text-secondary"}`}>
+                <span className={`small fw-bold ${esAdmin ? "text-light" : "text-secondary"}`}>
                   {sesion.nombre} ({sesion.rol})
                 </span>
                 <button
@@ -76,10 +78,10 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Menú de navegación: cambia de Morado a Azul Ejecutivo Slate cuando es Admin */}
+      {/* Menú de navegación: Azul Ejecutivo si es Admin, Morado si es Paciente/Nutri */}
       <nav 
         className="navbar navbar-expand-lg shadow-sm py-2"
-        style={{ backgroundColor: esVistaAdmin ? "#1e293b" : "#521d91" }}
+        style={{ backgroundColor: esAdmin ? "#1e293b" : "#521d91" }}
       >
         <div className="container justify-content-center">
           <div className="navbar-nav d-flex flex-row gap-3 align-items-center">
@@ -100,14 +102,14 @@ function Navbar() {
               Nuestros Nutricionistas
             </Link>
 
-            {/* Si es paciente o público muestra Agendar Cita */}
+            {/* Solo Pacientes o visatantes ven Agendar Cita */}
             {(!sesion || sesion.rol === "Paciente") && (
               <Link className={obtenerClaseLink("/agendar")} to="/agendar">
                 Agendar Cita
               </Link>
             )}
 
-            {/* Si es Nutricionista o Admin muestra Ver Pacientes */}
+            {/* Nutricionistas y Admin ven Ver Pacientes */}
             {sesion && (sesion.rol === "Admin" || sesion.rol === "Nutricionista") && (
               <Link className={obtenerClaseLink("/pacientes")} to="/pacientes">
                 Ver Pacientes
@@ -115,7 +117,7 @@ function Navbar() {
             )}
 
             {/* Panel de administración exclusivo de Admin */}
-            {sesion?.rol === "Admin" && (
+            {esAdmin && (
               <Link className={obtenerClaseLink("/administrador")} to="/administrador">
                 Panel Administración
               </Link>
