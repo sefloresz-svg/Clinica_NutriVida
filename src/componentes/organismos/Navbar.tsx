@@ -1,15 +1,25 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import logo from "../../assets/Captura_de_pantalla_2026-09-06_231024.png";
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
   const cerrarSesion = () => {
     sessionStorage.removeItem("sesionNutriVida");
     navigate("/");
+  };
+
+  // Evalúa si la ruta coincide con la página actual para colocar el subrayado
+  const obtenerClaseLink = (path: string) => {
+    const esActivo = location.pathname === path;
+    return `nav-link nav-link-nutri text-white ${
+      esActivo ? "fw-bold border-bottom border-2 border-white pb-1" : "fw-semibold"
+    }`;
   };
 
   return (
@@ -62,39 +72,41 @@ function Navbar() {
       {/* Menú de navegación inferior */}
       <nav className="navbar navbar-expand-lg bg-nutri-purple shadow-sm py-2">
         <div className="container justify-content-center">
-          <div className="navbar-nav d-flex flex-row gap-3">
-            <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/">
+          <div className="navbar-nav d-flex flex-row gap-3 align-items-center">
+            
+            <Link className={obtenerClaseLink("/")} to="/">
               Inicio
             </Link>
-            <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/novedades">
+
+            <Link className={obtenerClaseLink("/novedades")} to="/novedades">
               Novedades
             </Link>
-            <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/servicios">
+
+            <Link className={obtenerClaseLink("/servicios")} to="/servicios">
               Servicios
             </Link>
-            <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/nutricionistas">
+
+            <Link className={obtenerClaseLink("/nutricionistas")} to="/nutricionistas">
               Nuestros Nutricionistas
             </Link>
 
             {/* Si es paciente o público muestra Agendar Cita */}
             {(!sesion || sesion.rol === "Paciente") && (
-              <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/agendar">
+              <Link className={obtenerClaseLink("/agendar")} to="/agendar">
                 Agendar Cita
               </Link>
             )}
 
-            {/* Si es Nutricionista o Admin muestra Ver Pacientes igual al HTML */}
+            {/* Si es Nutricionista o Admin muestra Ver Pacientes */}
             {sesion && (sesion.rol === "Admin" || sesion.rol === "Nutricionista") && (
-              <Link className="nav-link nav-link-nutri text-white fw-semibold" to="/pacientes">
+              <Link className={obtenerClaseLink("/pacientes")} to="/pacientes">
                 Ver Pacientes
               </Link>
             )}
 
+            {/* Panel de administración exclusivo de Admin */}
             {sesion?.rol === "Admin" && (
-              <Link
-                to="/administrador"
-                className="text-white text-decoration-none small fw-bold border-bottom border-2 border-white pb-1"
-              >
+              <Link className={obtenerClaseLink("/administrador")} to="/administrador">
                 Panel Administración
               </Link>
             )}
