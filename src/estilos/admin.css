@@ -1,0 +1,97 @@
+/* Estilos Exclusivos para el Panel de Administración */
+
+.admin-page-wrapper {
+  background-color: #f8fafc;
+  min-height: 85vh;
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+/* Banner de Cabecera Sobrio y Profesional */
+.admin-header-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  color: #ffffff;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+}
+
+/* Tarjetas de Métricas (KPIs) */
+.admin-card-kpi {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-card-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-kpi-title {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-kpi-value {
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+/* Contenedor de la Tabla de Usuarios */
+.admin-table-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Botones con estilo ejecutivo */
+.btn-admin-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.btn-admin-primary:hover {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+/* Selector de Rol dentro de la Tabla */
+.admin-select-role {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  font-weight: 500;
+  background-color: #f8fafc;
+}
+
+.admin-select-role:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Estados / Badges */
+.admin-badge-active {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-badge-inactive {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
