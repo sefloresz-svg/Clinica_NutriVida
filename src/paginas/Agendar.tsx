@@ -42,7 +42,7 @@ const obtenerFechaHoy = (): string => {
 };
 
 // Validación de RUT Chileno estricto (sin puntos, con guion y algoritmo Módulo 11)
-const validarRutChileno = (rut: string): boolean => {
+export const validarRutChileno = (rut: string): boolean => {
   const rutLimpio = rut.trim().toUpperCase();
 
   const regexEstricto = /^\d{7,8}-[0-9K]$/;
