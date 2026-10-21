@@ -1,5 +1,4 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
 import logo from "../../assets/Captura_de_pantalla_2026-09-06_231024.png";
 
 function Navbar() {
@@ -9,12 +8,14 @@ function Navbar() {
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
+  // Detectar si estamos dentro del panel de administración
+  const esVistaAdmin = location.pathname === "/administrador";
+
   const cerrarSesion = () => {
     sessionStorage.removeItem("sesionNutriVida");
     navigate("/");
   };
 
-  // Evalúa si la ruta coincide con la página actual para colocar el subrayado
   const obtenerClaseLink = (path: string) => {
     const esActivo = location.pathname === path;
     return `nav-link nav-link-nutri text-white ${
@@ -23,9 +24,10 @@ function Navbar() {
   };
 
   return (
-    <header className="mb-4">
-      {/* Cabecera superior blanca */}
-      <div className="header-top py-2 border-bottom bg-white">
+    <header className="mb-0">
+      {/* Cabecera superior */}
+      <div className={`header-top py-2 border-bottom ${esVistaAdmin ? "bg-slate-900 text-white" : "bg-white"}`}
+           style={{ backgroundColor: esVistaAdmin ? "#0f172a" : "#ffffff" }}>
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/" className="d-flex align-items-center text-decoration-none">
             <img 
@@ -33,21 +35,26 @@ function Navbar() {
               alt="Logo Clínica NutriVida" 
               className="me-2" 
               style={{ 
-                width: "45px", 
-                height: "45px", 
+                width: "42px", 
+                height: "42px", 
                 borderRadius: "50%", 
                 objectFit: "cover" 
               }} 
             />
-            <span className="fs-4 fw-bold text-dark">
-              Clínica <span style={{ color: "#521d91" }}>NutriVida</span>
+            <span className={`fs-4 fw-bold ${esVistaAdmin ? "text-white" : "text-dark"}`}>
+              Clínica <span style={{ color: esVistaAdmin ? "#38bdf8" : "#521d91" }}>NutriVida</span>
             </span>
+            {esVistaAdmin && (
+              <span className="badge bg-primary ms-3 text-uppercase px-2 py-1 fs-7">
+                Console Admin
+              </span>
+            )}
           </Link>
 
           <div>
             {sesion ? (
               <div className="d-flex align-items-center gap-3">
-                <span className="text-secondary small fw-bold">
+                <span className={`small fw-bold ${esVistaAdmin ? "text-light" : "text-secondary"}`}>
                   {sesion.nombre} ({sesion.rol})
                 </span>
                 <button
@@ -69,8 +76,11 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Menú de navegación inferior */}
-      <nav className="navbar navbar-expand-lg bg-nutri-purple shadow-sm py-2">
+      {/* Menú de navegación: cambia de Morado a Azul Ejecutivo Slate cuando es Admin */}
+      <nav 
+        className="navbar navbar-expand-lg shadow-sm py-2"
+        style={{ backgroundColor: esVistaAdmin ? "#1e293b" : "#521d91" }}
+      >
         <div className="container justify-content-center">
           <div className="navbar-nav d-flex flex-row gap-3 align-items-center">
             

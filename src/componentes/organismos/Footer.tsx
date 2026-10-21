@@ -1,14 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Footer() {
+  const location = useLocation();
+
+  // Detectar si el usuario está en el Panel de Administración
+  const esVistaAdmin = location.pathname === "/administrador";
+
   return (
-    <footer className="mt-auto py-4 text-white" style={{ backgroundColor: "#3f1473" }}>
+    <footer
+      className="mt-auto py-4 text-white"
+      style={{
+        backgroundColor: esVistaAdmin ? "#0f172a" : "#3f1473",
+        transition: "background-color 0.3s ease",
+      }}
+    >
       <div className="container">
         <div className="row g-4">
           
           {/* Columna 1: Información de la clínica */}
           <div className="col-md-4">
-            <h5 className="fw-bold text-white mb-3">Clínica NutriVida</h5>
+            <h5 className="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+              Clínica NutriVida
+              {esVistaAdmin && (
+                <span className="badge bg-primary text-uppercase fs-7 px-2 py-1">
+                  Admin
+                </span>
+              )}
+            </h5>
             <p className="small opacity-75">
               Te acompañamos en tu camino hacia una vida saludable con planes 100% adaptados a tus objetivos médicos y deportivos.
             </p>
