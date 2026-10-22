@@ -1,107 +1,206 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-interface Articulo {
+interface Novedad {
+  id: number;
   titulo: string;
-  desc: string;
-  texto: string;
-  img: string;
+  categoria: string;
+  resumen: string;
+  contenidoCompleto: string;
+  fecha: string;
+  imagen: string;
 }
 
 function Novedades() {
-  const [articuloSeleccionado, setArticuloSeleccionado] = useState<Articulo | null>(null);
+  const [rol, setRol] = useState<string>("");
+  const [articuloSeleccionado, setArticuloSeleccionado] = useState<Novedad | null>(null);
 
-  const articulos: Articulo[] = [
-    {
-      titulo: "5 consejos para una alimentación saludable en invierno",
-      desc: "El frío nos hace buscar comidas más calóricas. Aprende a mantener una dieta equilibrada sin perder energía.",
-      texto: "Prioriza frutas y verduras de temporada, toma sopas caseras, mantente hidratado, modera las porciones calóricas y no dejes de hacer actividad física. Además, asegúrate de consumir suficiente vitamina C a través de cítricos para fortalecer tu sistema inmune durante los meses más fríos.",
-      img: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-      titulo: "Mitos y verdades de las dietas vegetarianas y veganas",
-      desc: "¿Es posible cubrir todos los nutrientes sin productos animales? Te contamos qué dice la evidencia.",
-      texto: "Una dieta vegetariana o vegana bien planificada puede cubrir todos los requerimientos nutricionales de una persona adulta. Los puntos clave a vigilar son el aporte de proteínas completas (combinando legumbres y cereales), hierro no-hem (mejor absorbido junto a vitamina C), vitamina B12 (que requiere suplementación) y calcio. En NutriVida diseñamos planes personalizados de alimentación basada en plantas, asegurando que no falte ningún nutriente esencial en tu día a día.",
-      img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-      titulo: "¿Por qué controlar tu peso cada 15 días y no cada mes?",
-      desc: "El seguimiento quincenal permite ajustar el plan a tiempo y mantener la motivación constante.",
-      texto: "Un control más frecuente permite detectar a tiempo si el plan no funciona, corregirlo rápido y ver avances que te mantienen motivado. Además, el acompañamiento continuo de tu nutricionista ayuda a resolver dudas puntuales sobre tu pauta alimentaria.",
-      img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&auto=format&fit=crop&q=80"
+  // Carga reactiva del rol
+  useEffect(() => {
+    const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+    if (sesionGuardada) {
+      try {
+        const sesion = JSON.parse(sesionGuardada);
+        setRol((sesion.rol || "").toString().toLowerCase().trim());
+      } catch (e) {
+        console.error("Error al leer la sesión:", e);
+      }
     }
-  ];
+  }, []);
+
+  const esAdmin = rol === "admin" || rol === "administrador";
+
+  // Lista inicial de novedades y consejos
+  const [novedades, setNovedades] = useState<Novedad[]>([
+    {
+      id: 1,
+      titulo: "5 Claves para Mantener una Hidratación Óptima",
+      categoria: "Consejo Nutricional",
+      resumen: "El agua es fundamental para el metabolismo. Descubre cómo calcular tus requerimientos diarios según tu estilo de vida.",
+      contenidoCompleto:
+        "La hidratación adecuada no solo previene la fatiga, sino que optimiza el rendimiento físico y cognitivo. Para calcular tus necesidades básicas, multiplica tu peso en kilos por 35 ml. No olvides priorizar el agua pura por encima de bebidas azucaradas o procesadas.",
+      fecha: "18 de Octubre, 2026",
+      imagen: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=500&auto=format&fit=crop&q=80",
+    },
+    {
+      id: 2,
+      titulo: "Mitos y Realidades del Ayuno Intermitente",
+      categoria: "Artículo Clínico",
+      resumen: "Analizamos qué dice la evidencia científica actual sobre los protocolos 16/8 y su impacto en la sensibilidad a la insulina.",
+      contenidoCompleto:
+        "El ayuno intermitente ha ganado popularidad, pero no es una solución mágica ni adecuada para todos los pacientes. Aunque muestra beneficios en el control glucémico y la flexibilidad metabólica, es imprescindible contar con supervisión profesional para evitar déficits nutricionales o atracones compensatorios.",
+      fecha: "12 de Octubre, 2026",
+      imagen: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=500&auto=format&fit=crop&q=80",
+    },
+    {
+      id: 3,
+      titulo: "Superalimentos Locales: El Valor Nutricional de la Quinua",
+      categoria: "Alimentación Saludable",
+      resumen: "Conoce las propiedades de este pseudocereal rico en aminoácidos esenciales, fibra y minerales esenciales.",
+      contenidoCompleto:
+        "La quinua es uno de los pocos alimentos vegetales que contiene los nueve aminoácidos esenciales. Además, su alto contenido en fibra de digestión lenta ayuda a mantener la saciedad durante más tiempo, convirtiéndola en una excelente opción para dietas orientadas al control de peso o diabetes.",
+      fecha: "05 de Octubre, 2026",
+      imagen: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&auto=format&fit=crop&q=80",
+    },
+  ]);
+
+  // Funciones de gestión para el Administrador
+  const manejarPublicar = () => {
+    alert("Modal para redactar y publicar una nueva novedad.");
+  };
+
+  const manejarEditar = (id: number, titulo: string) => {
+    alert(`Editar artículo #${id}: "${titulo}"`);
+  };
+
+  const manejarEliminar = (id: number) => {
+    if (confirm("¿Estás seguro de que deseas eliminar este artículo?")) {
+      setNovedades(novedades.filter((art) => art.id !== id));
+    }
+  };
 
   return (
     <div className="container my-4">
-      <h2 className="fw-bold mb-4 text-dark">Novedades y Consejos NutriVida</h2>
-      
-      {/* Grilla de Tarjetas con altura uniforme */}
+      {/* Cabecera Adaptativa */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+          <h2 className="fw-bold text-dark mb-1">Novedades y Consejos</h2>
+          <p className="text-muted small mb-0">
+            Artículos, recomendaciones clínicas y noticias de interés sobre salud y nutrición.
+          </p>
+        </div>
+
+        {/* Solo visible para el Administrador */}
+        {esAdmin && (
+          <button
+            className="btn btn-primary fw-bold px-3 py-2 rounded-3 shadow-sm text-nowrap"
+            onClick={manejarPublicar}
+          >
+            + Publicar Novedad
+          </button>
+        )}
+      </div>
+
+      {/* Grilla de Artículos */}
       <div className="row g-4">
-        {articulos.map((art, idx) => (
-          <div key={idx} className="col-12 col-md-4">
-            <div className="card card-nutri h-100 border-0 shadow-sm overflow-hidden d-flex flex-column justify-content-between">
+        {novedades.map((art) => (
+          <div key={art.id} className="col-12 col-md-6 col-lg-4">
+            <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white d-flex flex-column justify-content-between">
               <div>
                 <img
-                  src={art.img}
+                  src={art.imagen}
                   alt={art.titulo}
                   className="card-img-top"
                   style={{ height: "180px", objectFit: "cover" }}
                 />
                 <div className="p-3">
-                  <h5 className="fw-bold fs-6 text-dark mb-2">{art.titulo}</h5>
-                  <p className="text-muted small mb-0">{art.desc}</p>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <span className="badge bg-primary-subtle text-primary fw-semibold px-2 py-1 rounded-2 small">
+                      {art.categoria}
+                    </span>
+                    <small className="text-muted">{art.fecha}</small>
+                  </div>
+                  <h5 className="fw-bold text-dark mb-2 fs-6">{art.titulo}</h5>
+                  <p className="text-muted small mb-0">{art.resumen}</p>
                 </div>
               </div>
-              <div className="p-3 pt-0 mt-auto">
-                <button
-                  className="btn btn-nutri-teal btn-sm w-100"
-                  onClick={() => setArticuloSeleccionado(art)}
-                >
-                  Leer más
-                </button>
+
+              {/* Botones según Rol */}
+              <div className="p-3 pt-0">
+                {esAdmin ? (
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-outline-primary btn-sm w-100 fw-bold rounded-3"
+                      onClick={() => manejarEditar(art.id, art.titulo)}
+                    >
+                      Editar Artículo
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm w-100 fw-bold rounded-3"
+                      onClick={() => manejarEliminar(art.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="btn btn-outline-success btn-sm w-100 fw-bold rounded-3"
+                    onClick={() => setArticuloSeleccionado(art)}
+                  >
+                    Leer Artículo Completo
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Ventana Emergente / Modal estilo Pop-up */}
+      {/* MODAL EMERGENTE PARA PACIENTES / NUTRICIONISTAS */}
       {articuloSeleccionado && (
         <div
-          className="modal d-block bg-dark bg-opacity-50"
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           tabIndex={-1}
-          onClick={() => setArticuloSeleccionado(null)}
         >
-          <div
-            className="modal-dialog modal-dialog-centered"
-            style={{ maxWidth: "550px" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-content rounded-4 border-0 overflow-hidden shadow-lg position-relative">
-              {/* Botón flotante para cerrar (X) */}
-              <button
-                type="button"
-                className="btn-close position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded-circle shadow-sm"
-                aria-label="Cerrar"
-                onClick={() => setArticuloSeleccionado(null)}
-              ></button>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+              <div className="modal-header border-0 bg-light">
+                <div>
+                  <span className="badge bg-success-subtle text-success fw-semibold mb-1">
+                    {articuloSeleccionado.categoria}
+                  </span>
+                  <h5 className="modal-title fw-bold text-dark">{articuloSeleccionado.titulo}</h5>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setArticuloSeleccionado(null)}
+                ></button>
+              </div>
 
-              {/* Imagen del artículo */}
-              <img
-                src={articuloSeleccionado.img}
-                alt={articuloSeleccionado.titulo}
-                className="w-100"
-                style={{ height: "240px", objectFit: "cover" }}
-              />
-
-              {/* Contenido detallado */}
-              <div className="modal-body p-4 text-start">
-                <h4 className="fw-bold text-dark mb-3">
-                  {articuloSeleccionado.titulo}
-                </h4>
-                <p className="text-muted small lh-lg mb-0" style={{ fontSize: "0.95rem" }}>
-                  {articuloSeleccionado.texto}
+              <div className="modal-body p-4">
+                <img
+                  src={articuloSeleccionado.imagen}
+                  alt={articuloSeleccionado.titulo}
+                  className="w-100 rounded-3 mb-3 shadow-sm"
+                  style={{ maxHeight: "280px", objectFit: "cover" }}
+                />
+                <p className="text-muted small mb-3">
+                  <strong>Publicado el:</strong> {articuloSeleccionado.fecha}
                 </p>
+                <div className="text-dark leading-relaxed">
+                  {articuloSeleccionado.contenidoCompleto}
+                </div>
+              </div>
+
+              <div className="modal-footer border-0 bg-light">
+                <button
+                  type="button"
+                  className="btn btn-secondary fw-bold px-4 rounded-3"
+                  onClick={() => setArticuloSeleccionado(null)}
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>
