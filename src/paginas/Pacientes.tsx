@@ -1,135 +1,126 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Cita {
+interface PacienteAtencion {
   id: number;
   paciente: string;
   rut: string;
-  servicio: string;
-  nutricionista: string;
   fecha: string;
   hora: string;
-  motivo?: string;
-  peso?: string;
-  estatura?: string;
-  diagnostico?: string;
-  plan?: string;
+  servicio: string;
+  nutricionista: string;
+  peso: string;
+  estatura: string;
+  diagnostico: string;
 }
-
-// Pacientes iniciales requeridos de prueba
-const PACIENTES_PRUEBA_INICIALES: Cita[] = [
-  {
-    id: 1,
-    paciente: "Halam Dupre",
-    rut: "12345678-5",
-    fecha: "2026-10-28",
-    hora: "09:00 hrs",
-    servicio: "Primera consulta nutricional ($35.000)",
-    nutricionista: "Nut. Carolina Fuentes M.",
-    motivo: "Evaluación nutricional completa",
-    peso: "78",
-    estatura: "1.75",
-    diagnostico: "Sobrepeso leve, porcentaje de grasa elevado.",
-    plan: "Pauta hipocalórica de 1800 kcal, control de hidratación a 2L diarios."
-  },
-  {
-    id: 2,
-    paciente: "Joaquin Hidalgo",
-    rut: "31245387-1",
-    fecha: "2026-10-29",
-    hora: "10:30 hrs",
-    servicio: "Control nutricional ($25.000)",
-    nutricionista: "Nut. Carolina Fuentes M.",
-    motivo: "Control de masa muscular",
-    peso: "62",
-    estatura: "1.63",
-    diagnostico: "Normopeso con buena distribución muscular.",
-    plan: "Mantener plan de alimentación actual y ajustar colación post-entrenamiento."
-  }
-];
 
 function Pacientes() {
   const navigate = useNavigate();
-  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
-  const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  const [rol, setRol] = useState<string>("");
+  const [busqueda, setBusqueda] = useState<string>("");
+  const [pacienteSeleccionado, setPacienteSeleccionado] = useState<PacienteAtencion | null>(null);
 
-  const [busqueda, setBusqueda] = useState("");
-  const [pacienteSeleccionado, setPacienteSeleccionado] = useState<Cita | null>(null);
-
-  const [peso, setPeso] = useState("");
-  const [estatura, setEstatura] = useState("");
-  const [diagnostico, setDiagnostico] = useState("");
-  const [plan, setPlan] = useState("");
-
-  // Usar sessionStorage para persistencia de sesión únicamente
-  const [citas, setCitas] = useState<Cita[]>(() => {
-    const guardadas = sessionStorage.getItem("citasNutriVida");
-    if (guardadas) {
-      return JSON.parse(guardadas);
-    }
-    sessionStorage.setItem("citasNutriVida", JSON.stringify(PACIENTES_PRUEBA_INICIALES));
-    return PACIENTES_PRUEBA_INICIALES;
-  });
+  // Estados para la edición médica por parte del Nutricionista
+  const [diagnosticoEdit, setDiagnosticoEdit] = useState<string>("");
+  const [pesoEdit, setPesoEdit] = useState<string>("");
 
   useEffect(() => {
-    if (!sesion || (sesion.rol !== "Nutricionista" && sesion.rol !== "Admin")) {
-      alert("Acceso denegado. Esta área es exclusiva para profesionales de la salud.");
+    const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+    if (sesionGuardada) {
+      try {
+        const sesion = JSON.parse(sesionGuardada);
+        const rolUsuario = (sesion.rol || "").toString().toLowerCase().trim();
+        setRol(rolUsuario);
+
+        // Si ingresa un Paciente, se le deniega el acceso a esta vista
+        if (rolUsuario === "paciente") {
+          navigate("/agendar");
+        }
+      } catch (e) {
+        console.error("Error al leer la sesión:", e);
+      }
+    } else {
       navigate("/login");
     }
-  }, [sesion, navigate]);
+  }, [navigate]);
 
-  if (!sesion || (sesion.rol !== "Nutricionista" && sesion.rol !== "Admin")) return null;
+  const esAdmin = rol === "admin" || rol === "administrador";
+  const esNutri = rol === "nutricionista" || rol === "nutri";
 
-  const abrirFicha = (cita: Cita) => {
-    setPacienteSeleccionado(cita);
-    setPeso(cita.peso || "");
-    setEstatura(cita.estatura || "");
-    setDiagnostico(cita.diagnostico || "");
-    setPlan(cita.plan || "");
+  // Arreglo inicial de la agenda
+  const [atenciones, setAtenciones] = useState<PacienteAtencion[]>([
+    {
+      id: 1,
+      paciente: "Halam Dupre",
+      rut: "12345678-5",
+      fecha: "2026-10-28",
+      hora: "09:00 hrs",
+      servicio: "Primera consulta nutricional ($35.000)",
+      nutricionista: "Nut. Carolina Fuentes M.",
+      peso: "78.5 kg",
+      estatura: "1.72 m",
+      diagnostico: "Paciente en plan de déficit calórico moderado. Presenta antecedentes de hipertensión leve.",
+    },
+    {
+      id: 2,
+      paciente: "Joaquin Hidalgo",
+      rut: "31245387-1",
+      fecha: "2026-10-29",
+      hora: "10:30 hrs",
+      servicio: "Control nutricional ($25.000)",
+      nutricionista: "Nut. Carolina Fuentes M.",
+      peso: "82.0 kg",
+      estatura: "1.80 m",
+      diagnostico: "Control mensual. Buena adherencia al plan vegetariano y reducción de porcentaje graso.",
+    },
+  ]);
+
+  // Filtro de búsqueda por nombre o RUT
+  const atencionesFiltradas = atenciones.filter(
+    (a) =>
+      a.paciente.toLowerCase().includes(busqueda.toLowerCase()) ||
+      a.rut.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  const abrirFicha = (p: PacienteAtencion) => {
+    setPacienteSeleccionado(p);
+    setDiagnosticoEdit(p.diagnostico);
+    setPesoEdit(p.peso);
   };
 
-  const guardarFichaClinica = (e: React.FormEvent) => {
-    e.preventDefault();
+  const guardarFicha = () => {
     if (!pacienteSeleccionado) return;
-
-    const citasActualizadas = citas.map((c) => {
-      if (c.id === pacienteSeleccionado.id) {
-        return {
-          ...c,
-          peso: peso.trim(),
-          estatura: estatura.trim(),
-          diagnostico: diagnostico.trim(),
-          plan: plan.trim()
-        };
-      }
-      return c;
-    });
-
-    setCitas(citasActualizadas);
-    sessionStorage.setItem("citasNutriVida", JSON.stringify(citasActualizadas));
-
-    alert("¡Ficha clínica actualizada con éxito!");
+    setAtenciones((prev) =>
+      prev.map((item) =>
+        item.id === pacienteSeleccionado.id
+          ? { ...item, diagnostico: diagnosticoEdit, peso: pesoEdit }
+          : item
+      )
+    );
+    alert("Ficha clínica actualizada exitosamente.");
     setPacienteSeleccionado(null);
   };
 
-  const citasFiltradas = citas.filter(
-    (c) =>
-      c.paciente.toLowerCase().includes(busqueda.toLowerCase()) ||
-      c.rut.includes(busqueda)
-  );
-
   return (
     <div className="container my-4">
-      <h1 className="fw-bold fs-2 text-dark mb-1">Agenda de Pacientes</h1>
-      <p className="text-muted mb-4">Listado de citas asignadas a tu perfil profesional.</p>
+      {/* Encabezado */}
+      <div className="mb-4">
+        <h2 className="fw-bold text-dark mb-1">Agenda de Pacientes</h2>
+        <p className="text-muted small mb-0">
+          Listado de citas y registro de fichas clínicas asignadas al sistema.
+        </p>
+      </div>
 
-      <div className="card border-0 shadow-sm p-4 rounded-3 mb-5">
-        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-          <h4 className="fw-bold text-dark m-0">Mis Atenciones</h4>
+      {/* Contenedor Principal */}
+      <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+          <h5 className="fw-bold text-dark mb-0">Mis Atenciones</h5>
+          
+          {/* Buscador */}
           <div style={{ maxWidth: "320px", width: "100%" }}>
             <input
               type="text"
-              className="form-control form-control-sm bg-light"
+              className="form-control bg-light fs-6"
               placeholder="Buscar paciente o RUT..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
@@ -137,165 +128,155 @@ function Pacientes() {
           </div>
         </div>
 
+        {/* Tabla de Atenciones */}
         <div className="table-responsive">
-          <table className="table align-middle text-start mb-0">
-            <thead>
-              <tr className="text-uppercase text-secondary fs-7 border-bottom">
-                <th className="py-2 fw-bold">PACIENTE</th>
-                <th className="py-2 fw-bold">RUT</th>
-                <th className="py-2 fw-bold">FECHA / HORA</th>
-                <th className="py-2 fw-bold">SERVICIO</th>
-                <th className="py-2 fw-bold">NUTRICIONISTA</th>
-                <th className="py-2 fw-bold text-center">FICHA CLÍNICA</th>
+          <table className="table table-hover align-middle mb-0">
+            <thead className="table-light text-uppercase small text-muted">
+              <tr>
+                <th>Paciente</th>
+                <th>RUT</th>
+                <th>Fecha / Hora</th>
+                <th>Servicio</th>
+                <th>Nutricionista</th>
+                <th className="text-center">Ficha Clínica</th>
               </tr>
             </thead>
             <tbody>
-              {citasFiltradas.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-4 text-muted">
-                    No tienes citas ni pacientes asignados en tu agenda actualmente.
-                  </td>
-                </tr>
-              ) : (
-                citasFiltradas.map((cita) => (
-                  <tr key={cita.id} className="border-bottom">
-                    <td className="fw-bold text-dark py-3">{cita.paciente}</td>
-                    <td className="text-muted">{cita.rut}</td>
-                    <td className="text-dark">
-                      {cita.fecha} <br />
-                      <span className="badge bg-light text-dark border mt-1">{cita.hora}</span>
+              {atencionesFiltradas.length > 0 ? (
+                atencionesFiltradas.map((a) => (
+                  <tr key={a.id}>
+                    <td className="fw-bold text-dark">{a.paciente}</td>
+                    <td className="text-muted">{a.rut}</td>
+                    <td>
+                      <div className="fw-medium text-dark">{a.fecha}</div>
+                      <span className="badge bg-light text-dark border small">{a.hora}</span>
                     </td>
-                    <td className="text-muted">{cita.servicio}</td>
-                    <td className="text-muted">{cita.nutricionista}</td>
+                    <td className="small text-muted">{a.servicio}</td>
+                    <td className="small fw-medium text-dark">{a.nutricionista}</td>
                     <td className="text-center">
                       <button
-                        className="btn btn-outline-purple btn-sm fw-bold px-3"
-                        style={{ color: "#521d91", borderColor: "#521d91" }}
-                        onClick={() => abrirFicha(cita)}
+                        className="btn btn-outline-primary btn-sm px-3 fw-semibold rounded-3"
+                        onClick={() => abrirFicha(a)}
                       >
                         Ver Ficha
                       </button>
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-4 text-muted">
+                    No se encontraron pacientes que coincidan con la búsqueda.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Modal Ficha Clínica */}
+      {/* MODAL FICHA CLÍNICA */}
       {pacienteSeleccionado && (
-        <div className="modal d-block bg-dark bg-opacity-50" tabIndex={-1}>
+        <div
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          tabIndex={-1}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content rounded-3 border-0 overflow-hidden shadow-lg">
-              <div
-                className="modal-header border-0 text-white px-4 py-3"
-                style={{ backgroundColor: "#521d91" }}
-              >
-                <h5 className="modal-title fw-bold">Ficha Clínica del Paciente</h5>
+            <div className="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+              <div className="modal-header border-0 bg-light">
+                <div>
+                  <h5 className="modal-title fw-bold text-dark">
+                    Ficha Clínica: {pacienteSeleccionado.paciente}
+                  </h5>
+                  <small className="text-muted">RUT: {pacienteSeleccionado.rut}</small>
+                </div>
                 <button
                   type="button"
-                  className="btn-close btn-close-white"
+                  className="btn-close"
                   onClick={() => setPacienteSeleccionado(null)}
                 ></button>
               </div>
 
-              <form onSubmit={guardarFichaClinica}>
-                <div className="modal-body p-4">
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-dark small">Paciente:</label>
-                      <input
-                        type="text"
-                        className="form-control bg-light"
-                        value={pacienteSeleccionado.paciente}
-                        disabled
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-dark small">RUT:</label>
-                      <input
-                        type="text"
-                        className="form-control bg-light"
-                        value={pacienteSeleccionado.rut}
-                        disabled
-                      />
-                    </div>
-                  </div>
-
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-dark small">Peso (kg):</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Ej: 70"
-                        value={peso}
-                        onChange={(e) => setPeso(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-dark small">Estatura (m):</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Ej: 1.70"
-                        value={estatura}
-                        onChange={(e) => setEstatura(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-bold text-dark small">
-                      Diagnóstico Nutricional:
-                    </label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      placeholder="Escriba el diagnóstico actual del paciente..."
-                      value={diagnostico}
-                      onChange={(e) => setDiagnostico(e.target.value)}
+              <div className="modal-body p-4">
+                <div className="row g-3 mb-3">
+                  <div className="col-12 col-md-6">
+                    <label className="form-label fw-bold small text-dark">Atención / Servicio</label>
+                    <input
+                      type="text"
+                      className="form-control bg-light"
+                      value={pacienteSeleccionado.servicio}
+                      disabled
                     />
                   </div>
-
-                  <div className="mb-2">
-                    <label className="form-label fw-bold text-dark small">
-                      Plan / Indicaciones:
-                    </label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      placeholder="Pautas de alimentación, restricciones, controles..."
-                      value={plan}
-                      onChange={(e) => setPlan(e.target.value)}
+                  <div className="col-12 col-md-6">
+                    <label className="form-label fw-bold small text-dark">Profesional a Cargo</label>
+                    <input
+                      type="text"
+                      className="form-control bg-light"
+                      value={pacienteSeleccionado.nutricionista}
+                      disabled
+                    />
+                  </div>
+                  <div className="col-6 col-md-3">
+                    <label className="form-label fw-bold small text-dark">Estatura</label>
+                    <input
+                      type="text"
+                      className="form-control bg-light"
+                      value={pacienteSeleccionado.estatura}
+                      disabled
+                    />
+                  </div>
+                  <div className="col-6 col-md-3">
+                    <label className="form-label fw-bold small text-dark">Peso Registrado</label>
+                    <input
+                      type="text"
+                      className={`form-control ${esNutri ? "bg-white" : "bg-light"}`}
+                      value={pesoEdit}
+                      onChange={(e) => setPesoEdit(e.target.value)}
+                      disabled={esAdmin}
                     />
                   </div>
                 </div>
 
-                <div className="modal-footer border-0 px-4 pb-4 pt-0">
+                <div className="mb-3">
+                  <label className="form-label fw-bold small text-dark">
+                    Evolución y Diagnóstico Nutricional
+                  </label>
+                  <textarea
+                    rows={4}
+                    className={`form-control ${esNutri ? "bg-white" : "bg-light"}`}
+                    value={diagnosticoEdit}
+                    onChange={(e) => setDiagnosticoEdit(e.target.value)}
+                    disabled={esAdmin}
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="modal-footer border-0 bg-light">
+                <button
+                  type="button"
+                  className="btn btn-secondary fw-bold px-4 rounded-3"
+                  onClick={() => setPacienteSeleccionado(null)}
+                >
+                  Cerrar
+                </button>
+                
+                {/* Solo el Nutricionista ve y activa el botón de guardar */}
+                {esNutri && (
                   <button
                     type="button"
-                    className="btn btn-secondary px-4 py-2 font-semibold rounded-3"
-                    onClick={() => setPacienteSeleccionado(null)}
+                    className="btn btn-success fw-bold px-4 rounded-3"
+                    onClick={guardarFicha}
                   >
-                    Cancelar
+                    Guardar Cambios
                   </button>
-                  <button
-                    type="submit"
-                    className="btn text-white px-4 py-2 font-semibold rounded-3"
-                    style={{ backgroundColor: "#7c3aed" }}
-                  >
-                    Guardar Ficha
-                  </button>
-                </div>
-              </form>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
