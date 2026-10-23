@@ -1,84 +1,93 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-
-const USUARIOS = [
-  { correo: "admin@nutrivida.cl", clave: "1234", nombre: "Administrador", rol: "Admin" },
-  { correo: "nutri@nutrivida.cl", clave: "1234", nombre: "Dra. Carolina Fuentes", rol: "Nutricionista" },
-  { correo: "paciente@gmail.com", clave: "1234", nombre: "Juan Pérez", rol: "Paciente" }
-];
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Login() {
-  const [correo, setCorreo] = useState("");
-  const [clave, setClave] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const manejarEnvio = (e: React.FormEvent) => {
+  // Si venía desde la vista /agendar u otra, guarda esa ruta; si no, por defecto va a Inicio ("/")
+  const rutaDestino = location.state?.from || "/";
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const manejarLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
-    if (!correo.trim() || !clave.trim()) {
-      alert("Por favor, ingrese su correo y contraseña.");
+    let sesion = null;
+
+    // Validación de credenciales de prueba
+    if (email === "admin@nutrivida.cl" && password === "1234") {
+      sesion = { nombre: "Administrador", rol: "Admin" };
+    } else if (email === "nutri@nutrivida.cl" && password === "1234") {
+      sesion = { nombre: "Dra. Carolina Fuentes", rol: "Nutricionista" };
+    } else if (email === "paciente@nutrivida.cl" && password === "1234") {
+      sesion = { nombre: "Halam Dupre", rol: "Paciente" };
+    } else if (email.trim() !== "" && password.trim() !== "") {
+      // Permite ingresar con cualquier otro correo como Paciente
+      sesion = { nombre: email.split("@")[0], rol: "Paciente" };
+    } else {
+      setError("Por favor ingresa un correo y contraseña válidos.");
       return;
     }
 
-    const usuarioEncontrado = USUARIOS.find(
-      (u) => u.correo.toLowerCase() === correo.trim().toLowerCase() && u.clave === clave.trim()
-    );
+    // Guarda la sesión en sessionStorage
+    sessionStorage.setItem("sesionNutriVida", JSON.stringify(sesion));
 
-    if (usuarioEncontrado) {
-      sessionStorage.setItem("sesionNutriVida", JSON.stringify(usuarioEncontrado));
-      alert(`¡Bienvenido/a ${usuarioEncontrado.nombre}!`);
-
-      // Redirección inteligente: los profesionales van a Pacientes, el paciente a Agendar
-      if (usuarioEncontrado.rol === "Nutricionista" || usuarioEncontrado.rol === "Admin") {
-        navigate("/pacientes");
-      } else {
-        navigate("/agendar");
-      }
-    } else {
-      alert("Correo o contraseña incorrectos.");
-    }
+    // Redirección inteligente al destino (Inicio o Agendar)
+    navigate(rutaDestino);
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ backgroundColor: "#f0edfd" }}>
-      <div className="card border-0 shadow-sm p-4 p-md-5 rounded-4 text-center" style={{ maxWidth: "420px", width: "100%" }}>
-        <h2 className="fw-bold mb-1">
-          Clínica <span style={{ color: "#6b21a8" }}>NutriVida</span>
-        </h2>
-        <p className="text-muted small mb-4">Ingresa a tu cuenta para gestionar tus citas</p>
+    <div className="container my-5 d-flex justify-content-center align-items-center" style={{ minHeight: "70vh" }}>
+      <div className="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white" style={{ maxWidth: "450px", width: "100%" }}>
+        <div className="text-center mb-4">
+          <span className="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill mb-2">
+            ACCESO A NUTRICIÓN
+          </span>
+          <h3 className="fw-bold text-dark">Iniciar Sesión</h3>
+          <p className="text-muted small">Ingresa tus credenciales para acceder a la plataforma.</p>
+        </div>
 
-        <form onSubmit={manejarEnvio} className="text-start">
+        {error && <div className="alert alert-danger small py-2 fw-medium text-center">{error}</div>}
+
+        <form onSubmit={manejarLogin}>
           <div className="mb-3">
-            <label className="form-label fw-bold text-dark small">Correo Electrónico</label>
+            <label className="form-label fw-bold small text-dark">Correo Electrónico</label>
             <input
               type="email"
-              className="form-control form-control-lg bg-light fs-6"
-              placeholder="ejemplo@correo.com"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
+              className="form-control rounded-3 py-2"
+              placeholder="ejemplo@nutrivida.cl"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
           <div className="mb-4">
-            <label className="form-label fw-bold text-dark small">Contraseña</label>
+            <label className="form-label fw-bold small text-dark">Contraseña</label>
             <input
               type="password"
-              className="form-control form-control-lg bg-light fs-6"
+              className="form-control rounded-3 py-2"
               placeholder="••••••••"
-              value={clave}
-              onChange={(e) => setClave(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button type="submit" className="btn w-100 py-2 fw-bold text-white rounded-3" style={{ backgroundColor: "#10b981" }}>
-            Ingresar
+          <button type="submit" className="btn btn-success w-100 fw-bold py-2 rounded-3 shadow-sm mb-3">
+            Ingresar a la Plataforma
           </button>
         </form>
 
-        <div className="mt-4">
-          <Link to="/" className="text-decoration-none text-muted small">
-            ← Volver al sitio principal
-          </Link>
+        <div className="bg-light p-3 rounded-3 text-muted small border">
+          <strong className="d-block text-dark mb-1">Cuentas de Prueba:</strong>
+          <div>• Admin: <code>admin@nutrivida.cl</code> / <code>1234</code></div>
+          <div>• Nutri: <code>nutri@nutrivida.cl</code> / <code>1234</code></div>
+          <div>• Paciente: <code>paciente@nutrivida.cl</code> / <code>1234</code></div>
         </div>
       </div>
     </div>
