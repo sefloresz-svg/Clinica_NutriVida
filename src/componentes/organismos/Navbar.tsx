@@ -10,6 +10,8 @@ function Navbar() {
 
   // 🔹 La clave: Si el rol es Admin, activa el estilo ejecutivo en TODO el sitio
   const esAdmin = sesion?.rol === "Admin";
+  const esNutri = sesion?.rol?.toLowerCase() === "nutricionista" || sesion?.rol?.toLowerCase() === "nutri";
+  const esPaciente = sesion?.rol === "Paciente" || sesion?.rol?.toLowerCase() === "paciente";
 
   const cerrarSesion = () => {
     sessionStorage.removeItem("sesionNutriVida");
@@ -69,7 +71,7 @@ function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="btn btn-danger btn-sm fw-bold px-3 py-2 rounded-3 text-white text-decoration-none"
+                className="btn btn-success btn-sm fw-bold px-3 py-2 rounded-3 text-white text-decoration-none shadow-sm"
               >
                 Iniciar Sesión
               </Link>
@@ -103,14 +105,21 @@ function Navbar() {
             </Link>
 
             {/* Visible para todos excepto si inició sesión como Nutricionista */}
-            {(!sesion || sesion.rol?.toLowerCase() !== "nutricionista") && (
-              <Link to="/nosotros" className={obtenerClaseLink("/nosotros")}>
+            {!esNutri && (
+              <Link className={obtenerClaseLink("/nosotros")} to="/nosotros">
                 Nosotros
               </Link>
             )}
 
+            {/* Visible para el Público general o Pacientes autenticados */}
+            {(!sesion || esPaciente) && (
+              <Link className={obtenerClaseLink("/agendar")} to="/agendar">
+                Agendar Cita
+              </Link>
+            )}
+
             {/* Nutricionistas y Admin ven Ver Pacientes */}
-            {sesion && (sesion.rol === "Admin" || sesion.rol === "Nutricionista") && (
+            {sesion && (esAdmin || esNutri) && (
               <Link className={obtenerClaseLink("/pacientes")} to="/pacientes">
                 Ver Pacientes
               </Link>

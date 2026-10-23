@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface Cita {
   id: number;
@@ -68,12 +68,18 @@ export const validarRutChileno = (rut: string): boolean => {
 
 function Agendar() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
-  const [rut, setRut] = useState("");
-  const [servicio, setServicio] = useState("");
-  const [nutricionista, setNutricionista] = useState("");
+  // Cargar datos preseleccionados si vienen desde Servicios o Nutricionistas
+  const servicioInicial = location.state?.servicioPreseleccionado || "";
+  const nutriInicial = location.state?.nutricionistaPreseleccionado || "";
+
+  const [rut, setRut] = useState(sesion?.rut || "");
+  const [servicio, setServicio] = useState(servicioInicial);
+  const [nutricionista, setNutricionista] = useState(nutriInicial);
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [motivo, setMotivo] = useState("");
@@ -84,12 +90,13 @@ function Agendar() {
     return guardadas ? JSON.parse(guardadas) : [];
   });
 
+  // Redirección hacia /login recordando volver a /agendar tras ingresar
   useEffect(() => {
     if (!sesion) {
       alert("Debes iniciar sesión para agendar una hora de atención.");
-      navigate("/login");
+      navigate("/login", { state: { from: location.pathname } });
     }
-  }, [sesion, navigate]);
+  }, [sesion, navigate, location]);
 
   if (!sesion) return null;
 
@@ -266,6 +273,9 @@ function Agendar() {
                   <option value="Plan nutrición deportiva ($70.000)">
                     Plan nutrición deportiva ($70.000)
                   </option>
+                  <option value="Plan alimentación vegetariana/vegana ($68.000)">
+                    Plan alimentación vegetariana/vegana ($68.000)
+                  </option>
                 </select>
               </div>
 
@@ -371,7 +381,7 @@ function Agendar() {
                         {cita.servicio}
                       </span>
                       <span
-                        className="badge bg-purple text-white"
+                        className="badge text-white"
                         style={{ backgroundColor: "#521d91" }}
                       >
                         {cita.hora}
