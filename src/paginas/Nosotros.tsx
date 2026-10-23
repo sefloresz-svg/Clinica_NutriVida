@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Sucursal {
   id: number;
@@ -12,8 +12,25 @@ interface Sucursal {
 }
 
 function Nosotros() {
+  const [rol, setRol] = useState<string>("");
+
+  // Detección reactiva del rol desde sessionStorage
+  useEffect(() => {
+    const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+    if (sesionGuardada) {
+      try {
+        const sesion = JSON.parse(sesionGuardada);
+        setRol((sesion.rol || "").toString().toLowerCase().trim());
+      } catch (e) {
+        console.error("Error al leer la sesión:", e);
+      }
+    }
+  }, []);
+
+  const esAdmin = rol === "admin" || rol === "administrador";
+
   // Lista de sucursales en Temuco
-  const sucursales: Sucursal[] = [
+  const [sucursales, setSucursales] = useState<Sucursal[]>([
     {
       id: 1,
       nombre: "Sucursal Av. Alemania (Casa Matriz)",
@@ -58,21 +75,50 @@ function Nosotros() {
       mapaUrl:
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3112.7!2d-72.6201!3d-38.7511!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9614d3f000000000%3A0x9876543210fedcba!2sJaviera%20Carrera%2C%20Temuco%2C%20Araucan%C3%ADa!5e0!3m2!1ses!2scl!4v1700000000000!5m2!1ses!2scl",
     },
-  ];
+  ]);
 
   const [sucursalActiva, setSucursalActiva] = useState<Sucursal>(sucursales[0]);
 
+  // Funciones de gestión para el Administrador
+  const manejarAgregarSucursal = () => {
+    alert("Modal para registrar una nueva sucursal en el mapa.");
+  };
+
+  const manejarEditarSucursal = (suc: Sucursal) => {
+    alert(`Editar datos y mapa de "${suc.nombre}"`);
+  };
+
+  const manejarEliminarSucursal = (id: number) => {
+    if (confirm("¿Estás seguro de eliminar esta sucursal del registro?")) {
+      const nuevas = sucursales.filter((s) => s.id !== id);
+      setSucursales(nuevas);
+      if (nuevas.length > 0) setSucursalActiva(nuevas[0]);
+    }
+  };
+
   return (
     <div className="container my-5">
-      {/* Encabezado Principal */}
-      <div className="text-center mb-5">
-        <span className="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill mb-2">
-          NUESTRA INSTITUCIÓN
-        </span>
-        <h1 className="display-5 fw-bold text-dark">Sobre Clínica NutriVida</h1>
-        <p className="text-muted mx-auto fs-6" style={{ maxWidth: "720px" }}>
-          Centro de salud, nutrición clínica y rendimiento deportivo con múltiple presencia en la comuna de Temuco desde 2018.
-        </p>
+      {/* Encabezado Principal + Botón Admin */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
+        <div className="text-center text-md-start">
+          <span className="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill mb-2">
+            NUESTRA INSTITUCIÓN
+          </span>
+          <h1 className="display-5 fw-bold text-dark mb-1">Sobre Clínica NutriVida</h1>
+          <p className="text-muted fs-6 mb-0">
+            Centro de salud, nutrición clínica y rendimiento deportivo con múltiple presencia en Temuco.
+          </p>
+        </div>
+
+        {/* Botón Exclusivo de Administración */}
+        {esAdmin && (
+          <button
+            className="btn btn-primary fw-bold px-3 py-2 rounded-3 shadow-sm text-nowrap"
+            onClick={manejarAgregarSucursal}
+          >
+            + Agregar Sucursal
+          </button>
+        )}
       </div>
 
       {/* FILA SUPERIOR: Historia (Izquierda) vs Selector + Mapa (Derecha) */}
@@ -88,7 +134,7 @@ function Nosotros() {
           </p>
           <div className="d-flex gap-4 mt-4">
             <div className="border-start border-4 border-success ps-3">
-              <h4 className="fw-bold text-dark mb-0">4</h4>
+              <h4 className="fw-bold text-dark mb-0">{sucursales.length}</h4>
               <small className="text-muted">Centros en Temuco</small>
             </div>
             <div className="border-start border-4 border-primary ps-3">
@@ -102,7 +148,7 @@ function Nosotros() {
           </div>
         </div>
 
-        {/* Lado Derecho: Puntos de Atención ARRIBA + Mapa en reemplazo de la foto */}
+        {/* Lado Derecho: Puntos de Atención + Mapa */}
         <div className="col-12 col-lg-6">
           <div className="mb-3">
             <h5 className="fw-bold text-dark mb-2">📍 Puntos de Atención en Temuco</h5>
@@ -126,7 +172,7 @@ function Nosotros() {
             </div>
           </div>
 
-          {/* Visor de Mapa en la posición que antes ocupaba la foto */}
+          {/* Visor de Google Maps */}
           <div
             className="card border-0 shadow-sm rounded-4 overflow-hidden"
             style={{ height: "290px" }}
@@ -146,7 +192,7 @@ function Nosotros() {
         </div>
       </div>
 
-      {/* TARJETA DE DETALLES UBICADA ABAJO DE LA HISTORIA Y DEL MAPA */}
+      {/* TARJETA DE DETALLES + CONTROLES DE ADMINISTRACIÓN */}
       <div className="mb-5">
         <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
           <div className="row g-3 align-items-center">
@@ -201,21 +247,42 @@ function Nosotros() {
               </div>
             </div>
 
+            {/* Acciones según Rol */}
             <div className="col-12 col-lg-4 text-lg-end">
-              <div className="bg-light p-3 rounded-4 text-center text-lg-start border">
-                <small className="text-muted d-block mb-2 fw-medium">
-                  ¿Quieres agendar en este centro?
-                </small>
-                <a href="/agendar" className="btn btn-success w-100 fw-bold rounded-3 py-2">
-                  Agendar Cita en {sucursalActiva.nombre.replace("Sucursal ", "")}
-                </a>
-              </div>
+              {esAdmin ? (
+                <div className="bg-light p-3 rounded-4 border d-flex flex-column gap-2">
+                  <span className="small text-muted fw-bold text-center text-lg-start">
+                    Acciones de Administrador:
+                  </span>
+                  <button
+                    className="btn btn-outline-primary btn-sm fw-bold rounded-3"
+                    onClick={() => manejarEditarSucursal(sucursalActiva)}
+                  >
+                    Editar Datos / Mapa
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-sm fw-bold rounded-3"
+                    onClick={() => manejarEliminarSucursal(sucursalActiva.id)}
+                  >
+                    Eliminar esta Sucursal
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-light p-3 rounded-4 text-center text-lg-start border">
+                  <small className="text-muted d-block mb-2 fw-medium">
+                    ¿Quieres agendar en este centro?
+                  </small>
+                  <a href="/agendar" className="btn btn-success w-100 fw-bold rounded-3 py-2">
+                    Agendar Cita en {sucursalActiva.nombre.replace("Sucursal ", "")}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sección Reconocimientos y Calidad */}
+      {/* Reconocimientos y Calidad */}
       <div className="bg-light p-4 p-md-5 rounded-4 mb-5 border-0 shadow-sm">
         <h3 className="fw-bold text-dark text-center mb-4">
           🏆 Reconocimientos y Calidad Acreditada
