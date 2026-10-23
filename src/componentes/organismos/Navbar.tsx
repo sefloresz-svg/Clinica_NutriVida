@@ -102,6 +102,10 @@ function Navbar() {
               Nuestros Nutricionistas
             </Link>
 
+            <Link to="/nosotros" className={obtenerClaseLink("/nosotros")}>
+              Nosotros
+            </Link>
+
             {/* Solo Pacientes o visatantes ven Agendar Cita */}
             {(!sesion || sesion.rol === "Paciente") && (
               <Link className={obtenerClaseLink("/agendar")} to="/agendar">

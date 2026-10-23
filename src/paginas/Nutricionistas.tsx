@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-// 1. IMPORTACIÓN DIRECTA DESDE LA CARPETA ASSETS
 import fotoRodrigo from "../assets/Rodrigo.jpg";
 import fotoFelipe from "../assets/Felipe.jpg";
 
@@ -30,7 +28,7 @@ function Nutricionistas() {
   const esAdmin = rol === "admin" || rol === "administrador";
   const esNutri = rol === "nutricionista" || rol === "nutri";
 
-  // 2. USO DE LAS VARIABLES DE LAS IMÁGENES IMPORTADAS
+  // USO DE LAS VARIABLES DE LAS IMÁGENES IMPORTADAS
   const [equipo, setEquipo] = useState<Nutricionista[]>([
     {
       nombre: "Nut. Carolina Fuentes M.",

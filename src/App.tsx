@@ -9,30 +9,27 @@ import Login from "./paginas/Login";
 import Pacientes from "./paginas/Pacientes";
 import Footer from "./componentes/organismos/Footer";
 import Administrador from "./paginas/Administrador";
+import Nosotros from "./paginas/Nosotros";
 
 function App() {
   const location = useLocation();
-  // Si estamos en la ruta /login, no mostramos el Navbar superior
   const esPaginaLogin = location.pathname === "/login";
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      
       {!esPaginaLogin && <Navbar />}
 
       <main className="flex-grow-1">
         <Routes>
-
           <Route path="/" element={<Inicio />} />
+          <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/novedades" element={<Novedades />} />
           <Route path="/servicios" element={<Servicios />} />
           <Route path="/nutricionistas" element={<Nutricionistas />} />
           <Route path="/agendar" element={<Agendar />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pacientes" element={<Pacientes />} />
-
           <Route path="/administrador" element={<Administrador />} />
-
         </Routes>
       </main>
 
