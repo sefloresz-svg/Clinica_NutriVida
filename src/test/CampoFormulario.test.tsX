@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CampoFormulario from "../componentes/moleculas/CampoFormulario";
+import "@testing-library/jest-dom/vitest";
 
 describe("Componente CampoFormulario", () => {
   test("12. Debe mostrar la etiqueta label y renderizar el input con sus atributos", () => {

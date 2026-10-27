@@ -7,7 +7,7 @@ describe("Validación de RUT Chileno (validarRutChileno)", () => {
   });
 
   test("2. Debe retornar true para un RUT válido con dígito verificador K", () => {
-    expect(validarRutChileno("11111111-K")).toBe(true);
+    expect(validarRutChileno("11111112-K")).toBe(true);
   });
 
   test("3. Debe retornar false para un RUT con dígito verificador incorrecto", () => {
