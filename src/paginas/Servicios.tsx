@@ -1,102 +1,144 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API, obtenerSesion, leerError } from "../utils/api";
+import type { Servicio, FormularioServicio } from "../utils/tipos";
+import CardServicio from "../componentes/moleculas/CardServicio";
+import ModalServicio from "../componentes/organismos/ModalServicio";
 
-interface Servicio {
-  id: number;
-  titulo: string;
-  codigo: string;
-  duracion: string;
-  modalidad: string;
-  precio: string;
-  tipo: string;
-}
+// Datos del formulario del Admin (el precio se escribe como texto y se convierte a número)
+const FORMULARIO_VACIO: FormularioServicio = {
+  codigo: "",
+  titulo: "",
+  tipo: "Consulta",
+  duracion: "",
+  modalidad: "Presencial",
+  precio: "",
+};
 
+// Página contenedora: aquí están los fetch y los estados; las tarjetas y el modal solo muestran
 function Servicios() {
   const navigate = useNavigate();
-  const [rol, setRol] = useState<string>("");
+  const sesion = obtenerSesion();
+  const rol = (sesion?.rol || "").toLowerCase();
 
-  // Lectura reactiva de la sesión
+  const esAdmin = rol === "admin";
+  const esNutri = rol === "nutricionista";
+
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+
+  // Modal de crear / editar
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [idEditando, setIdEditando] = useState<number | null>(null);
+  const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
+  const [enviando, setEnviando] = useState(false);
+
+  // GET al abrir la página
+  const cargarServicios = () => {
+    fetch(`${API}/api/servicios`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar servicios");
+        return respuesta.json();
+      })
+      .then((datos) => setServicios(datos))
+      .catch(() => alert("No se pudieron cargar los servicios."));
+  };
+
   useEffect(() => {
-    const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
-    if (sesionGuardada) {
-      try {
-        const sesion = JSON.parse(sesionGuardada);
-        setRol((sesion.rol || "").toString().toLowerCase().trim());
-      } catch (e) {
-        console.error("Error al leer la sesión:", e);
-      }
-    }
+    cargarServicios();
   }, []);
 
-  const esAdmin = rol === "admin" || rol === "administrador";
-  const esNutri = rol === "nutricionista" || rol === "nutri";
-
-  // Arreglo de servicios y prestaciones
-  const [servicios, setServicios] = useState<Servicio[]>([
-    {
-      id: 1,
-      titulo: "Primera consulta nutricional",
-      codigo: "CN001",
-      duracion: "50 min",
-      modalidad: "Presencial",
-      precio: "$35.000",
-      tipo: "Consulta",
-    },
-    {
-      id: 2,
-      titulo: "Control nutricional (seguimiento)",
-      codigo: "CN002",
-      duracion: "30 min",
-      modalidad: "Presencial",
-      precio: "$25.000",
-      tipo: "Consulta",
-    },
-    {
-      id: 3,
-      titulo: "Plan pérdida de peso (1 mes)",
-      codigo: "PL001",
-      duracion: "1 mes",
-      modalidad: "Presencial",
-      precio: "$65.000",
-      tipo: "Plan especializado",
-    },
-    {
-      id: 4,
-      titulo: "Plan nutrición deportiva (1 mes)",
-      codigo: "PL003",
-      duracion: "1 mes",
-      modalidad: "Presencial",
-      precio: "$70.000",
-      tipo: "Plan especializado",
-    },
-    {
-      id: 5,
-      titulo: "Plan alimentación vegetariana/vegana",
-      codigo: "PL005",
-      duracion: "1 mes",
-      modalidad: "Presencial",
-      precio: "$68.000",
-      tipo: "Plan especializado",
-    },
-  ]);
-
-  // Redirección pasando el servicio preseleccionado
-  const reservarServicio = (nombreServicio: string) => {
-    navigate("/agendar", { state: { servicioPreseleccionado: nombreServicio } });
+  // Redirección pasando el servicio preseleccionado (por id)
+  const reservarServicio = (idServicio: number) => {
+    navigate("/agendar", { state: { servicioPreseleccionado: idServicio } });
   };
 
   // Funciones de gestión para el Administrador
   const manejarAgregar = () => {
-    alert("Modal para registrar una nueva prestación o arancel.");
+    setIdEditando(null);
+    setFormulario(FORMULARIO_VACIO);
+    setMostrarModal(true);
   };
 
-  const manejarEditar = (id: number, titulo: string) => {
-    alert(`Editar arancel o datos del servicio #${id}: "${titulo}"`);
+  const manejarEditar = (s: Servicio) => {
+    setIdEditando(s.id);
+    setFormulario({
+      codigo: s.codigo,
+      titulo: s.titulo,
+      tipo: s.tipo,
+      duracion: s.duracion,
+      modalidad: s.modalidad,
+      precio: String(s.precio),
+    });
+    setMostrarModal(true);
   };
 
-  const manejarEliminar = (id: number) => {
-    if (confirm("¿Estás seguro de eliminar este servicio del catálogo?")) {
-      setServicios(servicios.filter((s) => s.id !== id));
+  const cambiarCampo = (campo: string, valor: string) => {
+    setFormulario({ ...formulario, [campo]: valor });
+  };
+
+  // POST (crear) o PUT (editar)
+  const guardarServicio = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formulario.codigo.trim() || !formulario.titulo.trim() || !formulario.duracion.trim()) {
+      alert("Por favor, completa todos los campos del servicio.");
+      return;
+    }
+    const precio = Number(formulario.precio);
+    if (!Number.isInteger(precio) || precio < 1) {
+      alert("El precio debe ser un número entero mayor a 0 (sin puntos).");
+      return;
+    }
+
+    setEnviando(true);
+    try {
+      const url = idEditando
+        ? `${API}/api/servicios/${idEditando}?idAdmin=${sesion?.id}`
+        : `${API}/api/servicios?idAdmin=${sesion?.id}`;
+
+      const respuesta = await fetch(url, {
+        method: idEditando ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          codigo: formulario.codigo.trim(),
+          titulo: formulario.titulo.trim(),
+          tipo: formulario.tipo.trim(),
+          duracion: formulario.duracion.trim(),
+          modalidad: formulario.modalidad.trim(),
+          precio: precio,
+        }),
+      });
+
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "No se pudo guardar el servicio."));
+        return;
+      }
+
+      alert(idEditando ? "Servicio actualizado correctamente." : "Servicio agregado correctamente.");
+      setMostrarModal(false);
+      cargarServicios();
+    } catch {
+      alert("No se pudo conectar con el servidor.");
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  // DELETE (soft delete en el back)
+  const manejarEliminar = async (id: number) => {
+    if (!confirm("¿Estás seguro de eliminar este servicio del catálogo?")) return;
+
+    try {
+      const respuesta = await fetch(`${API}/api/servicios/${id}?idAdmin=${sesion?.id}`, {
+        method: "DELETE",
+      });
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "No se pudo eliminar el servicio."));
+        return;
+      }
+      cargarServicios();
+    } catch {
+      alert("No se pudo conectar con el servidor.");
     }
   };
 
@@ -126,55 +168,29 @@ function Servicios() {
       <div className="row g-4">
         {servicios.map((s) => (
           <div key={s.id} className="col-12 col-md-6 col-lg-4">
-            <div className="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-column justify-content-between">
-              <div>
-                <span className="badge bg-success-subtle text-success fw-semibold px-3 py-1 rounded-pill mb-2 small">
-                  {s.tipo}
-                </span>
-                <h5 className="fw-bold text-dark mb-1">{s.titulo}</h5>
-                <p className="text-muted small mb-2">
-                  Código: {s.codigo} <br />
-                  Duración: {s.duracion} | {s.modalidad}
-                </p>
-                <h4 className="fw-bold text-success mb-3">{s.precio}</h4>
-              </div>
-
-              <div>
-                {/* 1. ADMINISTRADOR */}
-                {esAdmin ? (
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-outline-primary btn-sm w-100 fw-bold rounded-3"
-                      onClick={() => manejarEditar(s.id, s.titulo)}
-                    >
-                      Editar Arancel
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-sm w-100 fw-bold rounded-3"
-                      onClick={() => manejarEliminar(s.id)}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ) : esNutri ? (
-                  /* 2. NUTRICIONISTA */
-                  <span className="badge bg-secondary-subtle text-secondary w-100 py-2 rounded-3 border fw-semibold d-block text-center">
-                    Catálogo Informativo
-                  </span>
-                ) : (
-                  /* 3. PACIENTE O PÚBLICO */
-                  <button
-                    className="btn btn-success w-100 fw-bold py-2 rounded-3"
-                    onClick={() => reservarServicio(s.titulo)}
-                  >
-                    Reservar este servicio
-                  </button>
-                )}
-              </div>
-            </div>
+            <CardServicio
+              servicio={s}
+              esAdmin={esAdmin}
+              esNutri={esNutri}
+              alEditar={manejarEditar}
+              alEliminar={manejarEliminar}
+              alReservar={reservarServicio}
+            />
           </div>
         ))}
       </div>
+
+      {/* MODAL CREAR / EDITAR SERVICIO (solo Admin) */}
+      {mostrarModal && (
+        <ModalServicio
+          formulario={formulario}
+          editando={idEditando !== null}
+          enviando={enviando}
+          alCambiar={cambiarCampo}
+          alGuardar={guardarServicio}
+          alCerrar={() => setMostrarModal(false)}
+        />
+      )}
     </div>
   );
 }
