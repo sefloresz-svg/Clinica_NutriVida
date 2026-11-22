@@ -2,36 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import CampoFormulario from "../moleculas/CampoFormulario";
 import Boton from "../atomos/Boton";
-
-interface Usuario {
-  correo: string;
-  clave: string;
-  nombre: string;
-  rut?: string;
-  rol: "Admin" | "Nutricionista" | "Paciente";
-}
-
-// Lista base de prueba
-const USUARIOS_BASE: Usuario[] = [
-  {
-    correo: "admin@nutrivida.cl",
-    clave: "1234",
-    nombre: "Administrador",
-    rol: "Admin",
-  },
-  {
-    correo: "nutri@nutrivida.cl",
-    clave: "1234",
-    nombre: "Dra. Carolina Fuentes",
-    rol: "Nutricionista",
-  },
-  {
-    correo: "paciente@gmail.com",
-    clave: "1234",
-    nombre: "Juan Pérez",
-    rol: "Paciente",
-  },
-];
+import { API, guardarSesion, leerError, type UsuarioSesion } from "../../utils/api";
+import { validarRutChileno } from "../../utils/validarRut";
 
 function FormularioLogin() {
   const navigate = useNavigate();
@@ -42,6 +14,9 @@ function FormularioLogin() {
 
   // Control para alternar entre "Iniciar Sesión" (false) y "Registrarse" (true)
   const [esRegistro, setEsRegistro] = useState(false);
+
+  // Bloquea el botón mientras se espera la respuesta del back
+  const [enviando, setEnviando] = useState(false);
 
   // Estados Formulario Login
   const [correo, setCorreo] = useState("");
@@ -54,21 +29,17 @@ function FormularioLogin() {
   const [claveReg, setClaveReg] = useState("");
   const [confirmarClaveReg, setConfirmarClaveReg] = useState("");
 
-  // Obtiene usuarios estáticos + usuarios guardados en la sesión activa
-  const obtenerUsuarios = (): Usuario[] => {
-    const almacenados = sessionStorage.getItem("usuariosRegistradosNutriVida");
-    if (almacenados) {
-      try {
-        return [...USUARIOS_BASE, ...JSON.parse(almacenados)];
-      } catch (e) {
-        return USUARIOS_BASE;
-      }
+  // Redirección según rol
+  const redirigir = (usuario: UsuarioSesion) => {
+    if (usuario.rol === "Nutricionista" || usuario.rol === "Admin") {
+      navigate("/pacientes");
+    } else {
+      navigate(rutaDestino);
     }
-    return USUARIOS_BASE;
   };
 
-  // MANEJO DE INICIO DE SESIÓN
-  const manejarLogin = (e: FormEvent) => {
+  // MANEJO DE INICIO DE SESIÓN (POST /api/usuarios/login)
+  const manejarLogin = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!correo.trim() || !clave.trim()) {
@@ -76,34 +47,48 @@ function FormularioLogin() {
       return;
     }
 
-    const todos = obtenerUsuarios();
-    const usuarioEncontrado = todos.find(
-      (u) =>
-        u.correo.toLowerCase() === correo.trim().toLowerCase() &&
-        u.clave === clave.trim()
-    );
+    setEnviando(true);
+    try {
+      const respuesta = await fetch(`${API}/api/usuarios/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: correo.trim(), contrasena: clave.trim() }),
+      });
 
-    if (usuarioEncontrado) {
-      sessionStorage.setItem("sesionNutriVida", JSON.stringify(usuarioEncontrado));
-      alert(`¡Bienvenido/a ${usuarioEncontrado.nombre}!`);
-
-      // Redirección según rol
-      if (usuarioEncontrado.rol === "Nutricionista" || usuarioEncontrado.rol === "Admin") {
-        navigate("/pacientes");
-      } else {
-        navigate(rutaDestino);
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "Correo o contraseña incorrectos."));
+        return;
       }
-    } else {
-      alert("Correo o contraseña incorrectos.");
+
+      const usuario: UsuarioSesion = await respuesta.json();
+      guardarSesion(usuario);
+      alert(`¡Bienvenido/a ${usuario.nombre}!`);
+      redirigir(usuario);
+    } catch {
+      alert("No se pudo conectar con el servidor. Intenta más tarde.");
+    } finally {
+      setEnviando(false);
     }
   };
 
-  // MANEJO DE REGISTRO DE PACIENTE
-  const manejarRegistro = (e: FormEvent) => {
+  // MANEJO DE REGISTRO DE PACIENTE (POST /api/usuarios/registro)
+  const manejarRegistro = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!nombreReg.trim() || !rutReg.trim() || !correoReg.trim() || !claveReg.trim()) {
       alert("Por favor, completa todos los campos del registro.");
+      return;
+    }
+
+    if (!validarRutChileno(rutReg)) {
+      alert(
+        "El RUT debe ingresarse sin puntos y con guion (ejemplo: 12345678-5). Revisa también que el dígito verificador sea el correcto."
+      );
+      return;
+    }
+
+    if (claveReg.length < 8) {
+      alert("La contraseña debe tener al menos 8 caracteres.");
       return;
     }
 
@@ -112,37 +97,34 @@ function FormularioLogin() {
       return;
     }
 
-    const todos = obtenerUsuarios();
-    const existe = todos.some(
-      (u) => u.correo.toLowerCase() === correoReg.trim().toLowerCase()
-    );
+    setEnviando(true);
+    try {
+      const respuesta = await fetch(`${API}/api/usuarios/registro`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: nombreReg.trim(),
+          rut: rutReg.trim(),
+          correo: correoReg.trim(),
+          contrasena: claveReg.trim(),
+        }),
+      });
 
-    if (existe) {
-      alert("El correo electrónico ya se encuentra registrado.");
-      return;
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "No se pudo completar el registro."));
+        return;
+      }
+
+      // Iniciar sesión automáticamente con el usuario que devuelve el back
+      const usuario: UsuarioSesion = await respuesta.json();
+      guardarSesion(usuario);
+      alert(`¡Registro exitoso! Bienvenido/a a Clínica NutriVida, ${usuario.nombre}.`);
+      navigate(rutaDestino);
+    } catch {
+      alert("No se pudo conectar con el servidor. Intenta más tarde.");
+    } finally {
+      setEnviando(false);
     }
-
-    const nuevoUsuario: Usuario = {
-      nombre: nombreReg.trim(),
-      rut: rutReg.trim(),
-      correo: correoReg.trim(),
-      clave: claveReg.trim(),
-      rol: "Paciente",
-    };
-
-    // Guardar en sessionStorage para mantener la persistencia dentro de la sesión
-    const previos = JSON.parse(
-      sessionStorage.getItem("usuariosRegistradosNutriVida") || "[]"
-    );
-    sessionStorage.setItem(
-      "usuariosRegistradosNutriVida",
-      JSON.stringify([...previos, nuevoUsuario])
-    );
-
-    // Iniciar sesión automáticamente
-    sessionStorage.setItem("sesionNutriVida", JSON.stringify(nuevoUsuario));
-    alert(`¡Registro exitoso! Bienvenido/a a Clínica NutriVida, ${nuevoUsuario.nombre}.`);
-    navigate(rutaDestino);
   };
 
   return (
@@ -150,8 +132,8 @@ function FormularioLogin() {
       className="card p-4 p-md-5 shadow-sm mx-auto border-0 rounded-4"
       style={{ maxWidth: "420px", width: "100%" }}
     >
-      <h3 className="text-center mb-1 fw-bold text-success">
-        Clínica NutriVida
+      <h3 className="text-center mb-1 fw-bold">
+        Clínica <span style={{ color: "#6b21a8" }}>NutriVida</span>
       </h3>
       <p className="text-center text-muted small mb-4">
         {esRegistro
@@ -181,9 +163,10 @@ function FormularioLogin() {
           />
 
           <Boton
-            texto="Ingresar"
+            texto={enviando ? "Enviando..." : "Ingresar"}
             tipo="submit"
             clase="btn btn-success w-100 mt-2 py-2 fw-bold"
+            deshabilitado={enviando}
           />
 
           <div className="text-center mt-3">
@@ -210,11 +193,11 @@ function FormularioLogin() {
           />
 
           <CampoFormulario
-            etiqueta="RUT"
+            etiqueta="RUT (sin puntos y con guion)"
             tipo="text"
             nombre="rutReg"
             valor={rutReg}
-            placeholder="12.345.678-9"
+            placeholder="12345678-5"
             alCambiar={setRutReg}
           />
 
@@ -228,7 +211,7 @@ function FormularioLogin() {
           />
 
           <CampoFormulario
-            etiqueta="Contraseña"
+            etiqueta="Contraseña (mínimo 8 caracteres)"
             tipo="password"
             nombre="claveReg"
             valor={claveReg}
@@ -246,9 +229,10 @@ function FormularioLogin() {
           />
 
           <Boton
-            texto="Crear Mi Cuenta"
+            texto={enviando ? "Enviando..." : "Crear Mi Cuenta"}
             tipo="submit"
             clase="btn btn-success w-100 mt-2 py-2 fw-bold"
+            deshabilitado={enviando}
           />
 
           <div className="text-center mt-3">
