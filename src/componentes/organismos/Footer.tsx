@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 function Footer() {
-  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+  const sesionGuardada = localStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
   // 🔹 Si el rol activo es Admin, el footer se vuelve oscuro

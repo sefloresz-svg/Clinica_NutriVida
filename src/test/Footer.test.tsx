@@ -5,7 +5,7 @@ import Footer from "../componentes/organismos/Footer";
 
 describe("Componente Footer", () => {
   beforeEach(() => {
-    sessionStorage.clear();
+    localStorage.clear();
   });
 
   test("17. Debe renderizar la información de contacto y enlaces institucionales", () => {
@@ -21,7 +21,7 @@ describe("Componente Footer", () => {
   });
 
   test("18. Debe incluir la insignia 'Admin Mode' cuando el usuario activo tiene rol Admin", () => {
-    sessionStorage.setItem(
+    localStorage.setItem(
       "sesionNutriVida",
       JSON.stringify({ nombre: "Admin", rol: "Admin" })
     );

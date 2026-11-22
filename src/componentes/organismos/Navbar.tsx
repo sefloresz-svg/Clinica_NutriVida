@@ -5,7 +5,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
+  const sesionGuardada = localStorage.getItem("sesionNutriVida");
   const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
 
   // 🔹 La clave: Si el rol es Admin, activa el estilo ejecutivo en TODO el sitio
@@ -14,7 +14,7 @@ function Navbar() {
   const esPaciente = sesion?.rol === "Paciente" || sesion?.rol?.toLowerCase() === "paciente";
 
   const cerrarSesion = () => {
-    sessionStorage.removeItem("sesionNutriVida");
+    localStorage.removeItem("sesionNutriVida");
     navigate("/");
   };
 
