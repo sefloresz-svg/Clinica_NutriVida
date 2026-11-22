@@ -1,75 +1,63 @@
-# React + TypeScript + Vite
+# Clínica NutriVida
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Página web de la Clínica NutriVida (Temuco), hecha para el ramo de Desarrollo Fullstack.
 
-Currently, two official plugins are available:
+- **Frontend** (esta carpeta): React + Vite + TypeScript + Bootstrap, ordenado con Atomic Design
+  (`src/componentes/atomos`, `moleculas`, `organismos` y `src/paginas`).
+- **Backend** (carpeta `../Microservicios`): Spring Boot con microservicios, Eureka y API Gateway.
+  Cada microservicio tiene su propia base de datos MySQL.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Servicio | Puerto | Base de datos |
+|---|---|---|
+| eureka-server | 8761 | — |
+| api-gateway | 8080 | — |
+| usuarios | 8081 | `usuarios` |
+| contenido | 8082 | `contenido` |
+| atenciones | 8083 | `atenciones` |
 
-## React Compiler
+El front solo habla con el gateway (`http://localhost:8080`).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Cómo levantar todo (en este orden)
 
-## Expanding the ESLint configuration
+1. **Laragon** con MySQL encendido (Start All) y las 3 bases creadas vacías en HeidiSQL:
+   ```sql
+   CREATE DATABASE usuarios;
+   CREATE DATABASE contenido;
+   CREATE DATABASE atenciones;
+   ```
+   Las tablas y los datos de prueba los crea Flyway al arrancar cada microservicio.
+2. **eureka-server**: `cd ../Microservicios/eureka-server` y `./mvnw spring-boot:run` (revisar http://localhost:8761).
+3. **api-gateway**: `cd ../Microservicios/api-gateway` y `./mvnw spring-boot:run`.
+4. **Los 3 microservicios**, cada uno en su terminal: `usuarios`, `contenido` y `atenciones` con `./mvnw spring-boot:run`.
+5. **Front**, en esta carpeta:
+   ```
+   npm install
+   npm run dev
+   ```
+   Abrir http://localhost:5173
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Usuarios de prueba
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Vienen en `usuarios/src/main/resources/db/migracion/V2__datos_iniciales.sql`.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Admin | admin@nutrivida.cl | Admin1234 |
+| Nutricionista | cfuentes@nutrivida.cl | Nutri1234 |
+| Nutricionista | rsepulveda@nutrivida.cl | Nutri1234 |
+| Nutricionista | dmorales@nutrivida.cl | Nutri1234 |
+| Nutricionista | faraya@nutrivida.cl | Nutri1234 |
+| Paciente | paciente@gmail.com | Paciente1234 |
+| Paciente | hdupre@gmail.com | Paciente1234 |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tests
 
+Front (Vitest + Testing Library), en esta carpeta:
+```
+npm run test
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+Back (JUnit 5 + Mockito, no necesitan MySQL), dentro de `usuarios`, `contenido` o `atenciones`:
+```
+./mvnw test -Dtest="*ServiceTest"
 ```
