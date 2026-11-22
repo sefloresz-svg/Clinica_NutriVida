@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # CORS global: por esto los controllers NO llevan @CrossOrigin
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "http://localhost:5173"
+                allowed-methods: GET, POST, PUT, DELETE, OPTIONS
+                allowed-headers: "*"
+          # Rutas: lb://<nombre en Eureka> reparte las peticiones al microservicio
+          routes:
+            - id: usuarios
+              uri: lb://usuarios
+              predicates:
+                - Path=/api/usuarios/**, /api/nutricionistas/**
+            - id: contenido
+              uri: lb://contenido
+              predicates:
+                - Path=/api/servicios/**, /api/novedades/**, /api/sucursales/**
+            - id: atenciones
+              uri: lb://atenciones
+              predicates:
+                - Path=/api/citas/**, /api/horarios/**, /api/fichas/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
