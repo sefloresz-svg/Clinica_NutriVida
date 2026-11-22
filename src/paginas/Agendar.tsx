@@ -1,36 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { API, obtenerSesion, leerError, formatearPrecio, formatearHora } from "../utils/api";
+import type { Cita } from "../utils/tipos";
+import TablaCitas from "../componentes/organismos/TablaCitas";
 
-interface Cita {
+// Lo que responde GET /api/servicios (solo lo que se usa en el select)
+interface ServicioOpcion {
   id: number;
-  paciente: string;
-  rut: string;
-  servicio: string;
-  nutricionista: string;
-  fecha: string;
-  hora: string;
-  motivo?: string;
+  titulo: string;
+  precio: number;
 }
 
-// Bloques de atención específicos asignados a cada profesional
-const HORARIOS_POR_NUTRICIONISTA: Record<string, string[]> = {
-  "Nut. Carolina Fuentes M.": [
-    "08:00 hrs", "08:30 hrs", "09:00 hrs", "09:30 hrs", "10:00 hrs",
-    "10:30 hrs", "11:00 hrs", "11:30 hrs", "12:00 hrs", "12:30 hrs"
-  ],
-  "Nut. Rodrigo Sepúlveda A.": [
-    "13:30 hrs", "14:00 hrs", "14:30 hrs", "15:00 hrs", "15:30 hrs",
-    "16:00 hrs", "16:30 hrs", "17:00 hrs", "17:30 hrs", "18:00 hrs"
-  ],
-  "Nut. Daniela Morales C.": [
-    "09:00 hrs", "09:30 hrs", "10:00 hrs", "10:30 hrs", "11:00 hrs",
-    "11:30 hrs", "12:00 hrs", "12:30 hrs", "13:00 hrs", "13:30 hrs"
-  ],
-  "Nut. Felipe Araya R.": [
-    "14:00 hrs", "14:30 hrs", "15:00 hrs", "15:30 hrs", "16:00 hrs",
-    "16:30 hrs", "17:00 hrs", "17:30 hrs", "18:00 hrs"
-  ]
-};
+// Lo que responde GET /api/nutricionistas (solo lo que se usa en el select)
+interface NutricionistaOpcion {
+  id: number;
+  nombre: string;
+}
+
+// Lo que responde GET /api/horarios/nutricionista/{id}
+interface Horario {
+  id: number;
+  idNutricionista: number;
+  hora: string; // "08:00:00"
+}
 
 // Obtener fecha actual en formato YYYY-MM-DD
 const obtenerFechaHoy = (): string => {
@@ -41,74 +33,123 @@ const obtenerFechaHoy = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Validación de RUT Chileno estricto (sin puntos, con guion y algoritmo Módulo 11)
-export const validarRutChileno = (rut: string): boolean => {
-  const rutLimpio = rut.trim().toUpperCase();
-
-  const regexEstricto = /^\d{7,8}-[0-9K]$/;
-  if (!regexEstricto.test(rutLimpio)) {
-    return false;
-  }
-
-  const [cuerpo, dvIngresado] = rutLimpio.split("-");
-
-  let suma = 0;
-  let multiplicador = 2;
-
-  for (let i = cuerpo.length - 1; i >= 0; i--) {
-    suma += parseInt(cuerpo.charAt(i), 10) * multiplicador;
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-  }
-
-  const resto = suma % 11;
-  const dvEsperado = 11 - resto === 11 ? "0" : 11 - resto === 10 ? "K" : (11 - resto).toString();
-
-  return dvIngresado === dvEsperado;
-};
-
 function Agendar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const sesion = obtenerSesion();
+  const idSesion = sesion?.id;
 
-  const sesionGuardada = sessionStorage.getItem("sesionNutriVida");
-  const sesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  // Aviso que manda otra página al redirigir aquí (ej: Pacientes)
+  const mensaje = location.state?.mensaje;
 
-  // Cargar datos preseleccionados si vienen desde Servicios o Nutricionistas
-  const servicioInicial = location.state?.servicioPreseleccionado || "";
-  const nutriInicial = location.state?.nutricionistaPreseleccionado || "";
+  // Datos preseleccionados si vienen desde Servicios o Nutricionistas (ahora son ids)
+  const servicioInicial = location.state?.servicioPreseleccionado ? String(location.state.servicioPreseleccionado) : "";
+  const nutriInicial = location.state?.nutricionistaPreseleccionado ? String(location.state.nutricionistaPreseleccionado) : "";
 
-  const [rut, setRut] = useState(sesion?.rut || "");
+  // Formulario
   const [servicio, setServicio] = useState(servicioInicial);
   const [nutricionista, setNutricionista] = useState(nutriInicial);
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [motivo, setMotivo] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
-  // Usar sessionStorage para mantener las citas únicamente en la sesión actual
-  const [citas, setCitas] = useState<Cita[]>(() => {
-    const guardadas = sessionStorage.getItem("citasNutriVida");
-    return guardadas ? JSON.parse(guardadas) : [];
-  });
+  // Datos que vienen del back
+  const [servicios, setServicios] = useState<ServicioOpcion[]>([]);
+  const [nutricionistas, setNutricionistas] = useState<NutricionistaOpcion[]>([]);
+  const [horarios, setHorarios] = useState<Horario[]>([]);
+  const [horariosDisponibles, setHorariosDisponibles] = useState<string[]>([]);
+  const [citas, setCitas] = useState<Cita[]>([]);
 
-  // Redirección hacia /login recordando volver a /agendar tras ingresar
+  // Mis citas (GET /api/citas?idUsuario=...)
+  const cargarCitas = () => {
+    fetch(`${API}/api/citas?idUsuario=${idSesion}`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar citas");
+        return respuesta.json();
+      })
+      .then((datos) => setCitas(datos))
+      .catch(() => alert("No se pudieron cargar tus citas."));
+  };
+
+  // Horas libres del nutricionista ese día (GET /api/citas/disponibles)
+  const cargarDisponibles = () => {
+    fetch(`${API}/api/citas/disponibles?idNutricionista=${nutricionista}&fecha=${fecha}`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar horas");
+        return respuesta.json();
+      })
+      .then((datos) => setHorariosDisponibles(datos))
+      .catch(() => alert("No se pudieron cargar las horas disponibles."));
+  };
+
+  // Redirección hacia /login recordando volver a /agendar tras ingresar.
+  // Solo los pacientes agendan (el back también lo valida).
+  // El aviso NO se muestra con alert aquí: con StrictMode el efecto corre 2 veces y saldría doble.
+  // Se manda en el state y lo muestra la página de destino.
   useEffect(() => {
-    if (!sesion) {
-      alert("Debes iniciar sesión para agendar una hora de atención.");
-      navigate("/login", { state: { from: location.pathname } });
+    if (!idSesion) {
+      navigate("/login", {
+        state: { from: location.pathname, mensaje: "Debes iniciar sesión para agendar una hora de atención." },
+      });
+      return;
     }
-  }, [sesion, navigate, location]);
+    if (sesion?.rol !== "Paciente") {
+      navigate("/pacientes", { state: { mensaje: "Solo los pacientes pueden agendar citas." } });
+      return;
+    }
 
-  if (!sesion) return null;
+    fetch(`${API}/api/servicios`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar servicios");
+        return respuesta.json();
+      })
+      .then((datos) => setServicios(datos))
+      .catch(() => alert("No se pudieron cargar los servicios."));
+
+    fetch(`${API}/api/nutricionistas`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar nutricionistas");
+        return respuesta.json();
+      })
+      .then((datos) => setNutricionistas(datos))
+      .catch(() => alert("No se pudieron cargar los nutricionistas."));
+
+    cargarCitas();
+  }, [idSesion]);
+
+  // Al elegir nutricionista se cargan sus bloques (para mostrar su horario)
+  useEffect(() => {
+    if (!nutricionista) return;
+    fetch(`${API}/api/horarios/nutricionista/${nutricionista}`)
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error("Error al cargar horario");
+        return respuesta.json();
+      })
+      .then((datos) => setHorarios(datos))
+      .catch(() => alert("No se pudo cargar el horario del nutricionista."));
+  }, [nutricionista]);
+
+  // Con nutricionista y fecha se piden las horas libres
+  useEffect(() => {
+    if (!nutricionista || !fecha) return;
+    cargarDisponibles();
+  }, [nutricionista, fecha]);
+
+  if (!sesion || sesion.rol !== "Paciente") return null;
 
   // Cambiar nutricionista y reiniciar la hora seleccionada
   const manejarCambioNutricionista = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNutricionista(e.target.value);
     setHora("");
+    setHorarios([]);
+    setHorariosDisponibles([]);
   };
 
-  // Manejar selección de fecha
+  // Manejar selección de fecha (mismas reglas que el back)
   const manejarCambioFecha = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fechaSeleccionada = e.target.value;
+    setHorariosDisponibles([]);
     if (!fechaSeleccionada) {
       setFecha("");
       return;
@@ -133,36 +174,9 @@ function Agendar() {
     setHora("");
   };
 
-  // Calcular horas disponibles filtrando reservas existentes en sessionStorage
-  const obtenerHorariosDisponibles = (): string[] => {
-    if (!nutricionista) return [];
-
-    const horariosBase = HORARIOS_POR_NUTRICIONISTA[nutricionista] || [];
-    if (!fecha) return horariosBase;
-
-    const horasOcupadas = citas
-      .filter((c) => c.nutricionista === nutricionista && c.fecha === fecha)
-      .map((c) => c.hora);
-
-    return horariosBase.filter((h) => !horasOcupadas.includes(h));
-  };
-
-  const horariosDisponibles = obtenerHorariosDisponibles();
-
-  const manejarAgendamiento = (e: React.FormEvent<HTMLFormElement>) => {
+  // POST /api/citas (el precio NO se envía: el back lo copia desde contenido)
+  const manejarAgendamiento = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!rut.trim()) {
-      alert("Por favor, ingrese el RUT del paciente.");
-      return;
-    }
-
-    if (!validarRutChileno(rut)) {
-      alert(
-        "El RUT debe ingresarse sin puntos y con guion (ejemplo: 12345678-5). Revisa también que el dígito verificador sea el correcto."
-      );
-      return;
-    }
 
     if (!servicio) {
       alert("Por favor, seleccione un servicio nutricional.");
@@ -184,37 +198,72 @@ function Agendar() {
       return;
     }
 
-    const nuevaCita: Cita = {
-      id: Date.now(),
-      paciente: sesion.nombre,
-      rut: rut.trim(),
-      servicio,
-      nutricionista,
-      fecha,
-      hora,
-      motivo: motivo.trim()
-    };
+    setEnviando(true);
+    try {
+      const respuesta = await fetch(`${API}/api/citas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idPaciente: sesion.id,
+          idServicio: Number(servicio),
+          idNutricionista: Number(nutricionista),
+          fecha: fecha,
+          hora: hora,
+          motivo: motivo.trim(),
+        }),
+      });
 
-    const listaActualizada = [...citas, nuevaCita];
-    setCitas(listaActualizada);
-    sessionStorage.setItem("citasNutriVida", JSON.stringify(listaActualizada));
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "No se pudo agendar la cita."));
+        cargarDisponibles();
+        return;
+      }
 
-    alert("¡Cita agendada exitosamente!");
-
-    setRut("");
-    setServicio("");
-    setNutricionista("");
-    setFecha("");
-    setHora("");
-    setMotivo("");
+      alert("¡Cita agendada exitosamente!");
+      setServicio("");
+      setNutricionista("");
+      setFecha("");
+      setHora("");
+      setMotivo("");
+      setHorarios([]);
+      setHorariosDisponibles([]);
+      cargarCitas();
+    } catch {
+      alert("No se pudo conectar con el servidor.");
+    } finally {
+      setEnviando(false);
+    }
   };
 
-  const misCitas = citas.filter(
-    (c) => c.paciente === sesion.nombre || sesion.rol === "Admin"
-  );
+  // DELETE /api/citas/{id} = cancelar (soft delete, la hora queda libre)
+  const cancelarCita = async (cita: Cita) => {
+    if (!confirm(`¿Deseas cancelar tu cita del ${cita.fecha} a las ${formatearHora(cita.hora)}?`)) return;
+
+    try {
+      const respuesta = await fetch(`${API}/api/citas/${cita.id}?idUsuario=${sesion.id}`, {
+        method: "DELETE",
+      });
+      if (!respuesta.ok) {
+        alert(await leerError(respuesta, "No se pudo cancelar la cita."));
+        return;
+      }
+      alert("Cita cancelada.");
+      cargarCitas();
+    } catch {
+      alert("No se pudo conectar con el servidor.");
+    }
+  };
+
+  // Texto del horario del nutricionista elegido, ej: "08:00 - 12:30 hrs"
+  const textoHorario =
+    horarios.length > 0
+      ? `${horarios[0].hora.slice(0, 5)} - ${horarios[horarios.length - 1].hora.slice(0, 5)} hrs`
+      : "";
 
   return (
     <div className="container my-4">
+      {mensaje && <div className="alert alert-warning">{mensaje}</div>}
+
       <h2 className="fw-bold mb-4" style={{ color: "#3f1473" }}>
         Reserva de Cita Nutricional
       </h2>
@@ -238,16 +287,16 @@ function Agendar() {
                 />
               </div>
 
+              {/* El RUT viene de la cuenta del paciente (no se guarda en la cita: 3FN) */}
               <div className="mb-3">
                 <label className="form-label text-muted small fw-bold">
-                  RUT (sin puntos y con guion):
+                  RUT:
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="12345678-5"
-                  value={rut}
-                  onChange={(e) => setRut(e.target.value)}
+                  value={sesion.rut || ""}
+                  disabled
                 />
               </div>
 
@@ -261,21 +310,11 @@ function Agendar() {
                   onChange={(e) => setServicio(e.target.value)}
                 >
                   <option value="">Seleccione un servicio</option>
-                  <option value="Primera consulta nutricional ($35.000)">
-                    Primera consulta nutricional ($35.000)
-                  </option>
-                  <option value="Control nutricional ($25.000)">
-                    Control nutricional ($25.000)
-                  </option>
-                  <option value="Plan pérdida de peso ($65.000)">
-                    Plan pérdida de peso ($65.000)
-                  </option>
-                  <option value="Plan nutrición deportiva ($70.000)">
-                    Plan nutrición deportiva ($70.000)
-                  </option>
-                  <option value="Plan alimentación vegetariana/vegana ($68.000)">
-                    Plan alimentación vegetariana/vegana ($68.000)
-                  </option>
+                  {servicios.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.titulo} ({formatearPrecio(s.precio)})
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -289,19 +328,15 @@ function Agendar() {
                   onChange={manejarCambioNutricionista}
                 >
                   <option value="">Seleccione especialista</option>
-                  <option value="Nut. Carolina Fuentes M.">
-                    Nut. Carolina Fuentes M. (Mañana: 08:00 - 12:30)
-                  </option>
-                  <option value="Nut. Rodrigo Sepúlveda A.">
-                    Nut. Rodrigo Sepúlveda A. (Tarde: 13:30 - 18:00)
-                  </option>
-                  <option value="Nut. Daniela Morales C.">
-                    Nut. Daniela Morales C. (Mañana: 09:00 - 13:30)
-                  </option>
-                  <option value="Nut. Felipe Araya R.">
-                    Nut. Felipe Araya R. (Tarde: 14:00 - 18:00)
-                  </option>
+                  {nutricionistas.map((n) => (
+                    <option key={n.id} value={n.id}>
+                      Nut. {n.nombre}
+                    </option>
+                  ))}
                 </select>
+                {textoHorario && (
+                  <small className="text-muted">Horario de atención: {textoHorario}</small>
+                )}
               </div>
 
               <div className="row g-2 mb-3">
@@ -326,18 +361,20 @@ function Agendar() {
                     className="form-select"
                     value={hora}
                     onChange={(e) => setHora(e.target.value)}
-                    disabled={!nutricionista}
+                    disabled={!nutricionista || !fecha}
                   >
                     <option value="">
                       {!nutricionista
                         ? "Seleccione un especialista primero"
+                        : !fecha
+                        ? "Seleccione una fecha primero"
                         : horariosDisponibles.length === 0
                         ? "Sin horas disponibles para este día"
                         : "Seleccione hora"}
                     </option>
                     {horariosDisponibles.map((h) => (
                       <option key={h} value={h}>
-                        {h}
+                        {formatearHora(h)}
                       </option>
                     ))}
                   </select>
@@ -351,14 +388,15 @@ function Agendar() {
                 <textarea
                   className="form-control"
                   rows={2}
+                  maxLength={500}
                   placeholder="Describa brevemente..."
                   value={motivo}
                   onChange={(e) => setMotivo(e.target.value)}
                 />
               </div>
 
-              <button type="submit" className="btn btn-nutri-purple w-100 mt-2">
-                Confirmar y Agendar Cita
+              <button type="submit" className="btn btn-nutri-purple w-100 mt-2" disabled={enviando}>
+                {enviando ? "Enviando..." : "Confirmar y Agendar Cita"}
               </button>
             </form>
           </div>
@@ -366,43 +404,7 @@ function Agendar() {
 
         {/* Panel Lateral "Mis Citas Registradas" */}
         <div className="col-md-5">
-          <div className="card card-nutri p-4 shadow-sm">
-            <h5 className="fw-bold mb-3">Mis Citas Registradas</h5>
-            {misCitas.length === 0 ? (
-              <p className="text-muted small">
-                No tienes citas agendadas actualmente.
-              </p>
-            ) : (
-              <div className="d-flex flex-column gap-3">
-                {misCitas.map((cita) => (
-                  <div key={cita.id} className="border rounded p-3 bg-light">
-                    <div className="d-flex justify-content-between align-items-center mb-1">
-                      <span className="fw-bold text-success small">
-                        {cita.servicio}
-                      </span>
-                      <span
-                        className="badge text-white"
-                        style={{ backgroundColor: "#521d91" }}
-                      >
-                        {cita.hora}
-                      </span>
-                    </div>
-                    <div className="small text-muted">
-                      <div>
-                        <strong>Fecha:</strong> {cita.fecha}
-                      </div>
-                      <div>
-                        <strong>Especialista:</strong> {cita.nutricionista}
-                      </div>
-                      <div>
-                        <strong>RUT:</strong> {cita.rut}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <TablaCitas citas={citas} alCancelar={cancelarCita} />
         </div>
       </div>
     </div>
