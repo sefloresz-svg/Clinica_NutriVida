@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { validarRutChileno } from "../paginas/Agendar";
+import { validarRutChileno } from "../utils/validarRut";
 
 describe("Validación de RUT Chileno (validarRutChileno)", () => {
   test("1. Debe retornar true para un RUT válido con dígito numérico", () => {
