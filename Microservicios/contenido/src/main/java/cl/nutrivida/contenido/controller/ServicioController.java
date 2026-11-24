@@ -3,6 +3,8 @@ package cl.nutrivida.contenido.controller;
 import cl.nutrivida.contenido.dto.ServicioEntradaDTO;
 import cl.nutrivida.contenido.model.Servicio;
 import cl.nutrivida.contenido.service.ServicioService;
+import cl.nutrivida.contenido.seguridad.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +17,11 @@ import java.util.List;
 public class ServicioController {
 
     private final ServicioService servicioService;
+    private final JwtUtil jwtUtil;
 
-    public ServicioController(ServicioService servicioService) {
+    public ServicioController(ServicioService servicioService, JwtUtil jwtUtil) {
         this.servicioService = servicioService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
@@ -30,21 +34,24 @@ public class ServicioController {
         return ResponseEntity.ok(servicioService.buscarPorId(id));
     }
 
-    // POST /api/servicios?idAdmin=1
+    // POST /api/servicios (token de Admin)
     @PostMapping
-    public ResponseEntity<Servicio> crear(@Valid @RequestBody ServicioEntradaDTO dto, @RequestParam Long idAdmin) {
+    public ResponseEntity<Servicio> crear(@Valid @RequestBody ServicioEntradaDTO dto, HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(servicioService.crear(dto, idAdmin));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Servicio> editar(@PathVariable Long id, @Valid @RequestBody ServicioEntradaDTO dto,
-                                           @RequestParam Long idAdmin) {
+                                           HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.ok(servicioService.editar(id, dto, idAdmin));
     }
 
     // Soft delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id, @RequestParam Long idAdmin) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id, HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         servicioService.eliminar(id, idAdmin);
         return ResponseEntity.noContent().build();
     }

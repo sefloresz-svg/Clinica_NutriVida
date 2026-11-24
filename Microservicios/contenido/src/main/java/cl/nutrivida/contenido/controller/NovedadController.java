@@ -3,6 +3,8 @@ package cl.nutrivida.contenido.controller;
 import cl.nutrivida.contenido.dto.NovedadEntradaDTO;
 import cl.nutrivida.contenido.model.Novedad;
 import cl.nutrivida.contenido.service.NovedadService;
+import cl.nutrivida.contenido.seguridad.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +17,11 @@ import java.util.List;
 public class NovedadController {
 
     private final NovedadService novedadService;
+    private final JwtUtil jwtUtil;
 
-    public NovedadController(NovedadService novedadService) {
+    public NovedadController(NovedadService novedadService, JwtUtil jwtUtil) {
         this.novedadService = novedadService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
@@ -31,18 +35,21 @@ public class NovedadController {
     }
 
     @PostMapping
-    public ResponseEntity<Novedad> crear(@Valid @RequestBody NovedadEntradaDTO dto, @RequestParam Long idAdmin) {
+    public ResponseEntity<Novedad> crear(@Valid @RequestBody NovedadEntradaDTO dto, HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novedadService.crear(dto, idAdmin));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Novedad> editar(@PathVariable Long id, @Valid @RequestBody NovedadEntradaDTO dto,
-                                          @RequestParam Long idAdmin) {
+                                          HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.ok(novedadService.editar(id, dto, idAdmin));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id, @RequestParam Long idAdmin) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id, HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         novedadService.eliminar(id, idAdmin);
         return ResponseEntity.noContent().build();
     }
