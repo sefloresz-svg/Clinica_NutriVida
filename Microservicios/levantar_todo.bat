@@ -1,6 +1,6 @@
 @echo off
 REM Levanta todo el backend en orden, cada servicio en su propia ventana.
-REM Antes: Laragon encendido (MySQL) y las 3 bases creadas con crear_bases.sql
+REM Antes: Laragon encendido (MySQL). Las bases se crean solas (createDatabaseIfNotExist=true)
 
 REM JDK a usar (el proyecto es Java 17, el JDK 21 lo compila sin problema)
 set JAVA_HOME=C:\Users\sebas\.jdks\ms-21.0.12.1
