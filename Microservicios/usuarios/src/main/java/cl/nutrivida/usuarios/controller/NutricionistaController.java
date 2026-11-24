@@ -4,6 +4,8 @@ import cl.nutrivida.usuarios.dto.NutricionistaCrearDTO;
 import cl.nutrivida.usuarios.dto.NutricionistaDTO;
 import cl.nutrivida.usuarios.dto.NutricionistaEditarDTO;
 import cl.nutrivida.usuarios.service.NutricionistaService;
+import cl.nutrivida.usuarios.seguridad.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,11 @@ import java.util.List;
 public class NutricionistaController {
 
     private final NutricionistaService nutricionistaService;
+    private final JwtUtil jwtUtil;
 
-    public NutricionistaController(NutricionistaService nutricionistaService) {
+    public NutricionistaController(NutricionistaService nutricionistaService, JwtUtil jwtUtil) {
         this.nutricionistaService = nutricionistaService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
@@ -36,22 +40,25 @@ public class NutricionistaController {
         return ResponseEntity.ok(nutricionistaService.buscarPorUsuario(idUsuario));
     }
 
-    // POST /api/nutricionistas?idAdmin=1
+    // POST /api/nutricionistas (token de Admin)
     @PostMapping
     public ResponseEntity<NutricionistaDTO> crear(@Valid @RequestBody NutricionistaCrearDTO dto,
-                                                  @RequestParam Long idAdmin) {
+                                                  HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nutricionistaService.crear(dto, idAdmin));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NutricionistaDTO> editar(@PathVariable Long id, @Valid @RequestBody NutricionistaEditarDTO dto,
-                                                   @RequestParam Long idAdmin) {
+                                                   HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         return ResponseEntity.ok(nutricionistaService.editar(id, dto, idAdmin));
     }
 
     // Soft delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id, @RequestParam Long idAdmin) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id, HttpServletRequest request) {
+        Long idAdmin = jwtUtil.obtenerIdAdmin(request);
         nutricionistaService.eliminar(id, idAdmin);
         return ResponseEntity.noContent().build();
     }
